@@ -27,11 +27,11 @@ final class CheckEnvironmentCommand extends Command
     #[Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $results = EnvironmentChecker::fromRuntime([
+        $report = EnvironmentChecker::fromRuntime([
             $this->aliases->get('@runtime'),
         ])->check();
 
-        foreach ($results as $result) {
+        foreach ($report->results as $result) {
             $label = match ($result->status) {
                 CheckStatus::Ok => '<info>[ ok ]</info>',
                 CheckStatus::Warning => '<comment>[warn]</comment>',
@@ -40,6 +40,6 @@ final class CheckEnvironmentCommand extends Command
             $output->writeln(sprintf('%s %s: %s', $label, $result->name, $result->message));
         }
 
-        return EnvironmentChecker::hasFailures($results) ? Command::FAILURE : Command::SUCCESS;
+        return $report->hasFailures() ? Command::FAILURE : Command::SUCCESS;
     }
 }

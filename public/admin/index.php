@@ -15,11 +15,13 @@ $root = dirname(__DIR__, 2);
 
 require_once $root . '/src/bootstrap.php';
 
+$environment = Environment::fromProcess();
+
 $runner = new HttpApplicationRunner(
     rootPath: $root,
-    debug: Environment::appDebug(),
-    checkEvents: Environment::appDebug(),
-    environment: Environment::appEnv(),
+    debug: $environment->debug,
+    checkEvents: $environment->debug,
+    environment: $environment->name,
     temporaryErrorHandler: new ErrorHandler(
         new Logger(
             [

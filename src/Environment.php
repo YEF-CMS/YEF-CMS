@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yef;
 
-use RuntimeException;
+use InvalidArgumentException;
 
 use function in_array;
 use function sprintf;
@@ -15,7 +15,7 @@ use function sprintf;
  * On shared hosting variables usually cannot be set, so the defaults are the production ones:
  * `APP_ENV=prod`, `APP_DEBUG=false`. Local development (Docker) sets them explicitly.
  */
-final class Environment
+final readonly class Environment
 {
     public const string DEV = 'dev';
 
@@ -29,61 +29,45 @@ final class Environment
         self::PROD,
     ];
 
-    /** @var non-empty-string */
-    private static string $appEnv = self::PROD;
+    /**
+     * @param non-empty-string $name
+     */
+    private function __construct(
+        public string $name,
+        public bool $debug,
+    ) {}
 
-    private static bool $appDebug = false;
-
-    public static function prepare(): void
+    public static function fromProcess(): self
     {
-        self::$appEnv = self::resolveEnvironment();
-        self::$appDebug = self::resolveBoolean('APP_DEBUG', false);
+        return self::fromValues(self::readVariable('APP_ENV'), self::readVariable('APP_DEBUG'));
     }
 
     /**
-     * @return non-empty-string
+     * @throws InvalidArgumentException When the environment name is not one of {@see self::ENVIRONMENTS}.
      */
-    public static function appEnv(): string
+    public static function fromValues(?string $name, ?string $debug): self
     {
-        return self::$appEnv;
-    }
+        $name = $name === null || $name === '' ? self::PROD : $name;
 
-    public static function appDebug(): bool
-    {
-        return self::$appDebug;
-    }
-
-    /**
-     * @return non-empty-string
-     */
-    private static function resolveEnvironment(): string
-    {
-        $raw = self::getRawValue('APP_ENV');
-        $environment = $raw === null || $raw === '' ? self::PROD : $raw;
-
-        if (!in_array($environment, self::ENVIRONMENTS, true)) {
-            throw new RuntimeException(
+        if (!in_array($name, self::ENVIRONMENTS, true)) {
+            throw new InvalidArgumentException(
                 sprintf(
                     'APP_ENV="%s" is invalid. Valid values are "%s".',
-                    $environment,
+                    $name,
                     implode('", "', self::ENVIRONMENTS),
                 ),
             );
         }
 
-        return $environment;
+        return new self($name, self::parseBoolean($debug));
     }
 
-    private static function resolveBoolean(string $key, bool $default): bool
+    private static function parseBoolean(?string $value): bool
     {
-        $value = self::getRawValue($key);
-
-        return $value === null
-            ? $default
-            : (filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? $default);
+        return $value !== null && filter_var($value, FILTER_VALIDATE_BOOLEAN);
     }
 
-    private static function getRawValue(string $key): ?string
+    private static function readVariable(string $key): ?string
     {
         $value = getenv($key);
         if ($value !== false) {

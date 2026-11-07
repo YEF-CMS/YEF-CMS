@@ -53,26 +53,15 @@ final readonly class EnvironmentChecker
         );
     }
 
-    /**
-     * @return list<CheckResult>
-     */
-    public function check(): array
+    public function check(): CheckReport
     {
-        return [
+        return new CheckReport([
             $this->checkPhpVersion(),
             ...$this->checkRequiredExtensions(),
             ...$this->checkRecommendedExtensions(),
             $this->checkHttpClient(),
             ...$this->checkWritableDirectories(),
-        ];
-    }
-
-    /**
-     * @param list<CheckResult> $results
-     */
-    public static function hasFailures(array $results): bool
-    {
-        return array_any($results, static fn(CheckResult $r): bool => $r->status === CheckStatus::Fail);
+        ]);
     }
 
     private function checkPhpVersion(): CheckResult

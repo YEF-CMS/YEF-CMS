@@ -6,6 +6,7 @@ namespace Yef\Tests\Setup;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Yef\Setup\CheckReport;
 use Yef\Setup\CheckResult;
 use Yef\Setup\CheckStatus;
 use Yef\Setup\EnvironmentChecker;
@@ -19,7 +20,7 @@ final class EnvironmentCheckerTest extends TestCase
     {
         $results = $this->checker()->check();
 
-        $this->assertFalse(EnvironmentChecker::hasFailures($results));
+        $this->assertFalse($results->hasFailures());
         $this->assertSame([], $this->withStatus($results, CheckStatus::Warning));
     }
 
@@ -27,7 +28,7 @@ final class EnvironmentCheckerTest extends TestCase
     {
         $results = $this->checker(phpVersion: '8.3.12')->check();
 
-        $this->assertTrue(EnvironmentChecker::hasFailures($results));
+        $this->assertTrue($results->hasFailures());
         $this->assertSame(CheckStatus::Fail, $this->find($results, 'PHP version')->status);
     }
 
@@ -42,7 +43,7 @@ final class EnvironmentCheckerTest extends TestCase
     {
         $results = $this->checker(extensions: ['ctype', 'json', 'mbstring'])->check();
 
-        $this->assertFalse(EnvironmentChecker::hasFailures($results));
+        $this->assertFalse($results->hasFailures());
         $this->assertSame(CheckStatus::Warning, $this->find($results, 'ext-zip')->status);
     }
 
@@ -82,12 +83,9 @@ final class EnvironmentCheckerTest extends TestCase
         );
     }
 
-    /**
-     * @param list<CheckResult> $results
-     */
-    private function find(array $results, string $name): CheckResult
+    private function find(CheckReport $report, string $name): CheckResult
     {
-        foreach ($results as $result) {
+        foreach ($report->results as $result) {
             if ($result->name === $name) {
                 return $result;
             }
@@ -97,11 +95,10 @@ final class EnvironmentCheckerTest extends TestCase
     }
 
     /**
-     * @param list<CheckResult> $results
      * @return list<CheckResult>
      */
-    private function withStatus(array $results, CheckStatus $status): array
+    private function withStatus(CheckReport $report, CheckStatus $status): array
     {
-        return array_values(array_filter($results, static fn(CheckResult $r): bool => $r->status === $status));
+        return array_values(array_filter($report->results, static fn(CheckResult $r): bool => $r->status === $status));
     }
 }
