@@ -34,5 +34,12 @@
                 <directory name="tests"/>
             </errorLevel>
         </UnusedClass>
+
+        <!-- Test fixtures are created in setUp(), not in the constructor. -->
+        <PropertyNotSetInConstructor>
+            <errorLevel type="suppress">
+                <directory name="tests"/>
+            </errorLevel>
+        </PropertyNotSetInConstructor>
     </issueHandlers>
 </psalm>
