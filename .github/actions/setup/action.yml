@@ -1,0 +1,34 @@
+name: Set up PHP and dependencies
+description: Install PHP, restore the Composer cache and install dependencies.
+
+inputs:
+  php-version:
+    description: PHP version.
+    default: '8.4'
+
+runs:
+  using: composite
+  steps:
+    - uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ inputs.php-version }}
+        extensions: ctype, fileinfo, intl, mbstring, zip
+        coverage: none
+        tools: composer:v2
+      env:
+        fail-fast: true
+
+    - name: Get Composer cache directory
+      id: composer-cache
+      shell: bash
+      run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+    - uses: actions/cache@v4
+      with:
+        path: ${{ steps.composer-cache.outputs.dir }}
+        key: composer-${{ inputs.php-version }}-${{ hashFiles('composer.lock') }}
+        restore-keys: composer-${{ inputs.php-version }}-
+
+    - name: Install dependencies
+      shell: bash
+      run: composer install --no-interaction --no-progress --prefer-dist

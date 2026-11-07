@@ -1,0 +1,110 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  composer:
+    name: Composer (validate, audit)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - run: composer validate:composer
+      - run: composer security
+
+  rector:
+    name: Rector
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - run: composer rector
+
+  cs:
+    name: Code style (PHP-CS-Fixer)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - run: composer cs
+
+  psalm:
+    name: Static analysis (Psalm)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - run: composer psalm
+
+  architecture:
+    name: Architecture (Deptrac, dependencies)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - run: composer deptrac
+      - run: composer deps
+
+  distribution:
+    name: Distribution (install without dev)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: ctype, fileinfo, intl, mbstring, zip
+          coverage: none
+          tools: composer:v2
+
+      - name: Build the distribution the way Packagist and GitHub archives do
+        run: |
+          mkdir "$RUNNER_TEMP/dist"
+          git archive HEAD | tar -x -C "$RUNNER_TEMP/dist"
+
+      - name: Development files must not be distributed
+        working-directory: ${{ runner.temp }}/dist
+        run: |
+          for path in tests docs docker docker-compose.yml .github psalm.xml rector.php deptrac.yaml phpunit.xml.dist .php-cs-fixer.dist.php composer-dependency-analyser.php CONTRIBUTING.md; do
+            if [ -e "$path" ]; then echo "::error::$path must not be in the distribution"; exit 1; fi
+          done
+
+      - name: Install as a user would
+        working-directory: ${{ runner.temp }}/dist
+        run: composer install --no-dev --no-interaction --no-progress
+
+      - name: Environment check
+        working-directory: ${{ runner.temp }}/dist
+        run: php bin/yef yef:check
+
+  tests:
+    name: Tests (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.4', '8.5']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+        with:
+          php-version: ${{ matrix.php }}
+      - run: composer test

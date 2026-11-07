@@ -1,0 +1,74 @@
+# Architecture boundaries. Dependencies point inwards only.
+deptrac:
+  paths:
+    - ./src
+  layers:
+    - name: Domain
+      collectors:
+        - { type: directory, value: src/Domain/.* }
+    - name: Application
+      collectors:
+        - { type: directory, value: src/Application/.* }
+    - name: Storage
+      collectors:
+        - { type: directory, value: src/Storage/.* }
+    - name: Rendering
+      collectors:
+        - { type: directory, value: src/Rendering/.* }
+    - name: Publishing
+      collectors:
+        - { type: directory, value: src/Publishing/.* }
+    - name: Admin
+      collectors:
+        - { type: directory, value: src/Admin/.* }
+    - name: Console
+      collectors:
+        - { type: directory, value: src/Console/.* }
+    - name: Module
+      collectors:
+        - { type: directory, value: src/Module/.* }
+    - name: Setup
+      collectors:
+        - { type: directory, value: src/Setup/.* }
+    # Vendor code
+    - name: Psr
+      collectors:
+        - { type: classNameRegex, value: '#^Psr\\#' }
+    - name: Framework
+      collectors:
+        - { type: classNameRegex, value: '#^(Yiisoft|Twig|Symfony|HttpSoft)\\#' }
+  ruleset:
+    Domain:
+      - Psr
+    Application:
+      - Domain
+      - Psr
+    Storage:
+      - Domain
+      - Psr
+      - Framework
+    Rendering:
+      - Domain
+      - Psr
+      - Framework
+    Publishing:
+      - Domain
+      - Psr
+      - Framework
+    Admin:
+      - Application
+      - Domain
+      - Psr
+      - Framework
+    Console:
+      - Application
+      - Domain
+      - Setup
+      - Psr
+      - Framework
+    Module:
+      - Application
+      - Domain
+      - Psr
+      - Framework
+    Setup: []

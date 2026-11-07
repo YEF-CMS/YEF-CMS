@@ -1,0 +1,25 @@
+# Dependencies
+/vendor/
+
+# Runtime data (caches, logs, locks)
+/var/*
+!/var/.gitkeep
+
+# Tooling caches
+/.phpunit.result.cache
+/.php-cs-fixer.cache
+
+# IDE
+/.idea/
+/.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local overrides
+/docker-compose.override.yml
+/.env
+
+# Tooling caches
+/.deptrac.cache

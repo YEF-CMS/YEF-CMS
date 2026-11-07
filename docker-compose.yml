@@ -1,0 +1,33 @@
+# Только для локальной разработки.
+#   docker compose up -d web                      → http://localhost:8080  (с .htaccess)
+#   docker compose --profile nohtaccess up -d     → http://localhost:8081  (без .htaccess)
+#   docker compose run --rm web composer install
+services:
+  web:
+    build: ./docker
+    image: yef-cms-dev
+    environment:
+      APP_ENV: dev
+      APP_DEBUG: "true"
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www/html
+      - ./docker/htaccess-on.conf:/etc/apache2/conf-enabled/zz-htaccess-on.conf:ro
+      - composer-cache:/root/.composer/cache
+
+  web-nohtaccess:
+    image: yef-cms-dev
+    profiles: [nohtaccess]
+    environment:
+      APP_ENV: dev
+      APP_DEBUG: "true"
+    ports:
+      - "8081:80"
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      - web
+
+volumes:
+  composer-cache:
