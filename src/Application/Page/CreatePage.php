@@ -36,7 +36,7 @@ final readonly class CreatePage
      * @throws InvalidPayload
      * @throws PathAlreadyTaken
      */
-    public function __invoke(CreatePageCommand $command): Page
+    public function handle(CreatePageCommand $command): Page
     {
         $type = new ContentTypeId($command->type);
         $definition = $this->types->get($type);

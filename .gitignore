@@ -23,3 +23,6 @@ Thumbs.db
 
 # Tooling caches
 /.deptrac.cache
+
+# Site content (the owner's data, not part of the code)
+/content/

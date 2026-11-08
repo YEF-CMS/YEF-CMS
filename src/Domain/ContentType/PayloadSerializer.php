@@ -8,21 +8,18 @@ use InvalidArgumentException;
 use Yef\Domain\ContentType\Exception\InvalidPayload;
 
 /**
- * Converts a payload to files and back. The type chooses names and formats, the core writes the files.
+ * Converts a payload to storage-independent data and back. The type chooses the parts and their format,
+ * the storage decides how to keep them.
  */
 interface PayloadSerializer
 {
     /**
-     * @return array<string, string> File name => contents.
-     *
      * @throws InvalidArgumentException When the payload was not created by this content type.
      */
-    public function toFiles(Payload $payload): array;
+    public function toData(Payload $payload): PayloadData;
 
     /**
-     * @param array<string, string> $files File name => contents.
-     *
-     * @throws InvalidPayload When the files do not form a valid payload.
+     * @throws InvalidPayload When the data does not form a valid payload.
      */
-    public function fromFiles(array $files): Payload;
+    public function fromData(PayloadData $data): Payload;
 }

@@ -35,6 +35,11 @@ final readonly class ContentTypeRegistry
         $this->definitions = $indexed;
     }
 
+    public function has(ContentTypeId $id): bool
+    {
+        return isset($this->definitions[$id->value]);
+    }
+
     /**
      * @throws UnknownContentType
      */

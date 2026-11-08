@@ -6,6 +6,7 @@ namespace Yef\Tests\Support;
 
 use Override;
 use Yef\Domain\Page\Exception\PageNotFound;
+use Yef\Domain\Page\Exception\PathAlreadyTaken;
 use Yef\Domain\Page\Page;
 use Yef\Domain\Page\PageId;
 use Yef\Domain\Page\PageMetadata;
@@ -20,6 +21,11 @@ final class InMemoryPageRepository implements PageRepository
     #[Override]
     public function save(Page $page): void
     {
+        $owner = $this->findMetadataByPath($page->metadata->details->path);
+        if ($owner instanceof PageMetadata && !$owner->id->equals($page->metadata->id)) {
+            throw PathAlreadyTaken::byPath($page->metadata->details->path);
+        }
+
         $this->pages[$page->metadata->id->value] = $page;
     }
 

@@ -25,6 +25,14 @@ final class ContentTypeRegistryTest extends TestCase
         $this->assertSame($definition, $registry->get(new ContentTypeId(TextContentType::ID)));
     }
 
+    public function testTellsWhetherTypeIsRegistered(): void
+    {
+        $registry = TextContentType::registry();
+
+        $this->assertTrue($registry->has(new ContentTypeId(TextContentType::ID)));
+        $this->assertFalse($registry->has(new ContentTypeId('gallery')));
+    }
+
     public function testUnknownTypeIsReported(): void
     {
         $this->expectException(UnknownContentType::class);

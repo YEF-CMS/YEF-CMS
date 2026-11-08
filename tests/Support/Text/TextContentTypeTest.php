@@ -9,6 +9,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Yef\Domain\ContentType\Exception\InvalidPayload;
 use Yef\Domain\ContentType\Payload;
+use Yef\Domain\ContentType\PayloadData;
 
 /**
  * Checks the behavior every content type has to provide, using the reference text type.
@@ -39,16 +40,16 @@ final class TextContentTypeTest extends TestCase
         $serializer = TextContentType::definition()->serializer;
         $payload = new TextPayload('<p>Привет, "мир"</p>' . "\n");
 
-        $restored = $serializer->fromFiles($serializer->toFiles($payload));
+        $restored = $serializer->fromData($serializer->toData($payload));
 
         $this->assertEquals($payload, $restored);
     }
 
-    public function testSerializerRejectsIncompleteFiles(): void
+    public function testSerializerRejectsIncompleteData(): void
     {
         $this->expectException(InvalidPayload::class);
 
-        TextContentType::definition()->serializer->fromFiles([]);
+        TextContentType::definition()->serializer->fromData(new PayloadData([]));
     }
 
     public function testRendererOutputsPayloadHtml(): void
@@ -66,7 +67,7 @@ final class TextContentTypeTest extends TestCase
 
         $this->expectException(InvalidArgumentException::class);
 
-        $definition->serializer->toFiles($foreign);
+        $definition->serializer->toData($foreign);
     }
 
     public function testRendererRejectsForeignPayload(): void

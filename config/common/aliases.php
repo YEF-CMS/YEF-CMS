@@ -9,4 +9,6 @@ return [
     '@vendor' => '@root/vendor',
     // Writable runtime data: caches, logs, locks. Never served directly.
     '@runtime' => '@root/var',
+    // Site content: pages and, later, media. The data of the site owner, never part of a release.
+    '@content' => '@root/content',
 ];

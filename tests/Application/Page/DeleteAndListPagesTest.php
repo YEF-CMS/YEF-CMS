@@ -41,12 +41,12 @@ final class DeleteAndListPagesTest extends TestCase
     public function testListsPagesOrderedByPath(): void
     {
         foreach (['contacts', 'about', 'blog/hello'] as $path) {
-            ($this->createPage)(new CreatePageCommand('text', $path, 'Title', []));
+            $this->createPage->handle(new CreatePageCommand('text', $path, 'Title', []));
         }
 
         $paths = array_map(
             static fn(PageMetadata $metadata): string => $metadata->details->path->value,
-            (new ListPages($this->pages))(),
+            new ListPages($this->pages)->handle(),
         );
 
         $this->assertSame(['about', 'blog/hello', 'contacts'], $paths);
@@ -54,9 +54,9 @@ final class DeleteAndListPagesTest extends TestCase
 
     public function testDeletesPage(): void
     {
-        $page = ($this->createPage)(new CreatePageCommand('text', 'about', 'About', []));
+        $page = $this->createPage->handle(new CreatePageCommand('text', 'about', 'About', []));
 
-        (new DeletePage($this->pages))($page->metadata->id->value);
+        new DeletePage($this->pages)->handle($page->metadata->id->value);
 
         $this->assertSame([], $this->pages->allMetadata());
     }
@@ -65,6 +65,6 @@ final class DeleteAndListPagesTest extends TestCase
     {
         $this->expectException(PageNotFound::class);
 
-        (new DeletePage($this->pages))('01ARZ3NDEKTSV4RRFFQ69G5FAV');
+        new DeletePage($this->pages)->handle('01ARZ3NDEKTSV4RRFFQ69G5FAV');
     }
 }

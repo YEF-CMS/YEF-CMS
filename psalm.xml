@@ -35,6 +35,13 @@
             </errorLevel>
         </UnusedClass>
 
+        <!-- Contract test methods are inherited and run by PHPUnit in the subclasses. -->
+        <PossiblyUnusedMethod>
+            <errorLevel type="suppress">
+                <directory name="tests/Contract"/>
+            </errorLevel>
+        </PossiblyUnusedMethod>
+
         <!-- Test fixtures are created in setUp(), not in the constructor. -->
         <PropertyNotSetInConstructor>
             <errorLevel type="suppress">

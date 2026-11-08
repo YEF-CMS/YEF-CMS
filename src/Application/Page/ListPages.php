@@ -17,7 +17,7 @@ final readonly class ListPages
     /**
      * @return list<PageMetadata> Ordered by path.
      */
-    public function __invoke(): array
+    public function handle(): array
     {
         $pages = $this->pages->allMetadata();
         usort(

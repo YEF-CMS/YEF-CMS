@@ -8,25 +8,26 @@ use InvalidArgumentException;
 use Override;
 use Yef\Domain\ContentType\Exception\InvalidPayload;
 use Yef\Domain\ContentType\Payload;
+use Yef\Domain\ContentType\PayloadData;
 use Yef\Domain\ContentType\PayloadSerializer;
 
 final readonly class TextPayloadSerializer implements PayloadSerializer
 {
-    public const string FILE = 'body.html';
+    public const string BODY = 'body';
 
     #[Override]
-    public function toFiles(Payload $payload): array
+    public function toData(Payload $payload): PayloadData
     {
         if (!$payload instanceof TextPayload) {
             throw new InvalidArgumentException('Expected a text payload.');
         }
 
-        return [self::FILE => $payload->html];
+        return new PayloadData([self::BODY => $payload->html]);
     }
 
     #[Override]
-    public function fromFiles(array $files): Payload
+    public function fromData(PayloadData $data): Payload
     {
-        return new TextPayload($files[self::FILE] ?? throw new InvalidPayload('body.html is missing.'));
+        return new TextPayload($data->part(self::BODY) ?? throw new InvalidPayload('The body is missing.'));
     }
 }

@@ -37,7 +37,7 @@ final readonly class UpdatePage
      * @throws InvalidPayload
      * @throws PathAlreadyTaken
      */
-    public function __invoke(UpdatePageCommand $command): Page
+    public function handle(UpdatePageCommand $command): Page
     {
         $page = $this->pages->get(new PageId($command->id));
         $definition = $this->types->get($page->metadata->type);

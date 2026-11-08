@@ -20,7 +20,7 @@ final readonly class DeletePage
      * @throws InvalidArgumentException When the id is invalid.
      * @throws PageNotFound
      */
-    public function __invoke(string $id): void
+    public function handle(string $id): void
     {
         $this->pages->delete(new PageId($id));
     }

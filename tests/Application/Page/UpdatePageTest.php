@@ -52,7 +52,7 @@ final class UpdatePageTest extends TestCase
         $page = $this->create('about');
         $this->clock->moveTo('2026-11-09 08:00:00 UTC');
 
-        $updated = ($this->updatePage)(new UpdatePageCommand(
+        $updated = $this->updatePage->handle(new UpdatePageCommand(
             $page->metadata->id->value,
             'company/about',
             'About us',
@@ -77,9 +77,9 @@ final class UpdatePageTest extends TestCase
     {
         $page = $this->create('about');
         $id = $page->metadata->id->value;
-        ($this->updatePage)(new UpdatePageCommand($id, 'about', 'About', [], true));
+        $this->updatePage->handle(new UpdatePageCommand($id, 'about', 'About', [], true));
 
-        $draft = ($this->updatePage)(new UpdatePageCommand($id, 'about', 'About', [], false));
+        $draft = $this->updatePage->handle(new UpdatePageCommand($id, 'about', 'About', [], false));
 
         $this->assertFalse($draft->metadata->isPublished());
     }
@@ -88,7 +88,7 @@ final class UpdatePageTest extends TestCase
     {
         $page = $this->create('about');
 
-        $updated = ($this->updatePage)(
+        $updated = $this->updatePage->handle(
             new UpdatePageCommand($page->metadata->id->value, 'about', 'Renamed', [], false),
         );
 
@@ -102,7 +102,7 @@ final class UpdatePageTest extends TestCase
 
         $this->expectException(PathAlreadyTaken::class);
 
-        ($this->updatePage)(new UpdatePageCommand($about->metadata->id->value, 'contacts', 'About', [], false));
+        $this->updatePage->handle(new UpdatePageCommand($about->metadata->id->value, 'contacts', 'About', [], false));
     }
 
     public function testInvalidPayloadLeavesStoredPageUntouched(): void
@@ -110,7 +110,7 @@ final class UpdatePageTest extends TestCase
         $page = $this->create('about');
 
         try {
-            ($this->updatePage)(
+            $this->updatePage->handle(
                 new UpdatePageCommand($page->metadata->id->value, 'about', 'About', ['body' => 42], true),
             );
             $this->fail('An invalid payload must be rejected.');
@@ -123,11 +123,11 @@ final class UpdatePageTest extends TestCase
     {
         $this->expectException(PageNotFound::class);
 
-        ($this->updatePage)(new UpdatePageCommand('01ARZ3NDEKTSV4RRFFQ69G5FAV', 'about', 'About', [], false));
+        $this->updatePage->handle(new UpdatePageCommand('01ARZ3NDEKTSV4RRFFQ69G5FAV', 'about', 'About', [], false));
     }
 
     private function create(string $path): Page
     {
-        return ($this->createPage)(new CreatePageCommand('text', $path, ucfirst($path), ['body' => '<p>Hi</p>']));
+        return $this->createPage->handle(new CreatePageCommand('text', $path, ucfirst($path), ['body' => '<p>Hi</p>']));
     }
 }

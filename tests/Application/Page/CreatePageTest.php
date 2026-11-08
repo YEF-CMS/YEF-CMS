@@ -42,7 +42,7 @@ final class CreatePageTest extends TestCase
 
     public function testCreatesDraftPageAndStoresIt(): void
     {
-        $page = ($this->createPage)(
+        $page = $this->createPage->handle(
             new CreatePageCommand('text', 'about', 'About', ['body' => '<p>Hi</p>'], 'Meta', 'Description'),
         );
 
@@ -57,24 +57,24 @@ final class CreatePageTest extends TestCase
 
     public function testRejectsPathUsedByAnotherPage(): void
     {
-        ($this->createPage)(new CreatePageCommand('text', 'about', 'About', []));
+        $this->createPage->handle(new CreatePageCommand('text', 'about', 'About', []));
 
         $this->expectException(PathAlreadyTaken::class);
 
-        ($this->createPage)(new CreatePageCommand('text', 'about', 'Other', []));
+        $this->createPage->handle(new CreatePageCommand('text', 'about', 'Other', []));
     }
 
     public function testRejectsUnknownContentType(): void
     {
         $this->expectException(UnknownContentType::class);
 
-        ($this->createPage)(new CreatePageCommand('gallery', 'photos', 'Photos', []));
+        $this->createPage->handle(new CreatePageCommand('gallery', 'photos', 'Photos', []));
     }
 
     public function testRejectsInvalidPayloadWithoutStoringAnything(): void
     {
         try {
-            ($this->createPage)(new CreatePageCommand('text', 'about', 'About', ['body' => 42]));
+            $this->createPage->handle(new CreatePageCommand('text', 'about', 'About', ['body' => 42]));
             $this->fail('An invalid payload must be rejected.');
         } catch (InvalidPayload) {
             $this->assertSame([], $this->pages->allMetadata());
@@ -84,7 +84,7 @@ final class CreatePageTest extends TestCase
     public function testRejectsInvalidPathWithoutStoringAnything(): void
     {
         try {
-            ($this->createPage)(new CreatePageCommand('text', 'Bad Path', 'Title', []));
+            $this->createPage->handle(new CreatePageCommand('text', 'Bad Path', 'Title', []));
             $this->fail('An invalid path must be rejected.');
         } catch (InvalidArgumentException) {
             $this->assertSame([], $this->pages->allMetadata());
@@ -94,7 +94,7 @@ final class CreatePageTest extends TestCase
     public function testRejectsEmptyTitleWithoutStoringAnything(): void
     {
         try {
-            ($this->createPage)(new CreatePageCommand('text', 'about', ' ', []));
+            $this->createPage->handle(new CreatePageCommand('text', 'about', ' ', []));
             $this->fail('An empty title must be rejected.');
         } catch (InvalidArgumentException) {
             $this->assertSame([], $this->pages->allMetadata());
