@@ -12,10 +12,11 @@ use Yef\Application\Page\CreatePageCommand;
 use Yef\Application\Page\DeletePage;
 use Yef\Application\Page\ListPages;
 use Yef\Domain\Page\Exception\PageNotFound;
-use Yef\Domain\Page\Page;
+use Yef\Domain\Page\PageMetadata;
 use Yef\Tests\Support\FrozenClock;
 use Yef\Tests\Support\InMemoryPageRepository;
 use Yef\Tests\Support\SequentialPageIdGenerator;
+use Yef\Tests\Support\Text\TextContentType;
 
 #[CoversClass(DeletePage::class)]
 #[CoversClass(ListPages::class)]
@@ -29,17 +30,22 @@ final class DeleteAndListPagesTest extends TestCase
     protected function setUp(): void
     {
         $this->pages = new InMemoryPageRepository();
-        $this->createPage = new CreatePage($this->pages, new SequentialPageIdGenerator(), new FrozenClock());
+        $this->createPage = new CreatePage(
+            $this->pages,
+            TextContentType::registry(),
+            new SequentialPageIdGenerator(),
+            new FrozenClock(),
+        );
     }
 
     public function testListsPagesOrderedByPath(): void
     {
         foreach (['contacts', 'about', 'blog/hello'] as $path) {
-            ($this->createPage)(new CreatePageCommand($path, 'Title', ''));
+            ($this->createPage)(new CreatePageCommand('text', $path, 'Title', []));
         }
 
         $paths = array_map(
-            static fn(Page $page): string => $page->path->value,
+            static fn(PageMetadata $metadata): string => $metadata->details->path->value,
             (new ListPages($this->pages))(),
         );
 
@@ -48,11 +54,11 @@ final class DeleteAndListPagesTest extends TestCase
 
     public function testDeletesPage(): void
     {
-        $page = ($this->createPage)(new CreatePageCommand('about', 'About', ''));
+        $page = ($this->createPage)(new CreatePageCommand('text', 'about', 'About', []));
 
-        (new DeletePage($this->pages))($page->id->value);
+        (new DeletePage($this->pages))($page->metadata->id->value);
 
-        $this->assertSame([], $this->pages->all());
+        $this->assertSame([], $this->pages->allMetadata());
     }
 
     public function testDeletingUnknownPageFails(): void

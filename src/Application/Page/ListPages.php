@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yef\Application\Page;
 
-use Yef\Domain\Page\Page;
+use Yef\Domain\Page\PageMetadata;
 use Yef\Domain\Page\PageRepository;
 
 /**
@@ -15,12 +15,15 @@ final readonly class ListPages
     public function __construct(private PageRepository $pages) {}
 
     /**
-     * @return list<Page> Ordered by path.
+     * @return list<PageMetadata> Ordered by path.
      */
     public function __invoke(): array
     {
-        $pages = $this->pages->all();
-        usort($pages, static fn(Page $a, Page $b): int => $a->path->value <=> $b->path->value);
+        $pages = $this->pages->allMetadata();
+        usort(
+            $pages,
+            static fn(PageMetadata $a, PageMetadata $b): int => $a->details->path->value <=> $b->details->path->value,
+        );
 
         return $pages;
     }

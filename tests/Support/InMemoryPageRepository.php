@@ -8,6 +8,7 @@ use Override;
 use Yef\Domain\Page\Exception\PageNotFound;
 use Yef\Domain\Page\Page;
 use Yef\Domain\Page\PageId;
+use Yef\Domain\Page\PageMetadata;
 use Yef\Domain\Page\PagePath;
 use Yef\Domain\Page\PageRepository;
 
@@ -19,7 +20,7 @@ final class InMemoryPageRepository implements PageRepository
     #[Override]
     public function save(Page $page): void
     {
-        $this->pages[$page->id->value] = $page;
+        $this->pages[$page->metadata->id->value] = $page;
     }
 
     #[Override]
@@ -29,11 +30,11 @@ final class InMemoryPageRepository implements PageRepository
     }
 
     #[Override]
-    public function findByPath(PagePath $path): ?Page
+    public function findMetadataByPath(PagePath $path): ?PageMetadata
     {
         foreach ($this->pages as $page) {
-            if ($page->path->equals($path)) {
-                return $page;
+            if ($page->metadata->details->path->equals($path)) {
+                return $page->metadata;
             }
         }
 
@@ -41,9 +42,9 @@ final class InMemoryPageRepository implements PageRepository
     }
 
     #[Override]
-    public function all(): array
+    public function allMetadata(): array
     {
-        return array_values($this->pages);
+        return array_values(array_map(static fn(Page $page): PageMetadata => $page->metadata, $this->pages));
     }
 
     #[Override]

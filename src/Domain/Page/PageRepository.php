@@ -18,12 +18,12 @@ interface PageRepository
      */
     public function get(PageId $id): Page;
 
-    public function findByPath(PagePath $path): ?Page;
+    public function findMetadataByPath(PagePath $path): ?PageMetadata;
 
     /**
-     * @return list<Page>
+     * @return list<PageMetadata>
      */
-    public function all(): array;
+    public function allMetadata(): array;
 
     /**
      * @throws PageNotFound

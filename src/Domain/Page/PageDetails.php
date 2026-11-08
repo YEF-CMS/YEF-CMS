@@ -9,15 +9,13 @@ use InvalidArgumentException;
 use function trim;
 
 /**
- * What an editor writes on a page: title, HTML body and SEO fields.
- *
- * @psalm-api Read by the storage and rendering layers.
+ * What an editor controls about a page besides its type-specific payload.
  */
-final readonly class PageContent
+final readonly class PageDetails
 {
     public function __construct(
+        public PagePath $path,
         public string $title,
-        public string $body,
         public string $metaTitle = '',
         public string $metaDescription = '',
     ) {

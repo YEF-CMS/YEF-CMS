@@ -11,12 +11,15 @@ use Yef\Application\Page\CreatePage;
 use Yef\Application\Page\CreatePageCommand;
 use Yef\Application\Page\UpdatePage;
 use Yef\Application\Page\UpdatePageCommand;
+use Yef\Domain\ContentType\Exception\InvalidPayload;
 use Yef\Domain\Page\Exception\PageNotFound;
 use Yef\Domain\Page\Exception\PathAlreadyTaken;
 use Yef\Domain\Page\Page;
 use Yef\Tests\Support\FrozenClock;
 use Yef\Tests\Support\InMemoryPageRepository;
 use Yef\Tests\Support\SequentialPageIdGenerator;
+use Yef\Tests\Support\Text\TextContentType;
+use Yef\Tests\Support\Text\TextPayload;
 
 #[CoversClass(UpdatePage::class)]
 #[CoversClass(UpdatePageCommand::class)]
@@ -35,44 +38,61 @@ final class UpdatePageTest extends TestCase
     {
         $this->pages = new InMemoryPageRepository();
         $this->clock = new FrozenClock();
-        $this->updatePage = new UpdatePage($this->pages, $this->clock);
-        $this->createPage = new CreatePage($this->pages, new SequentialPageIdGenerator(), $this->clock);
+        $this->updatePage = new UpdatePage($this->pages, TextContentType::registry(), $this->clock);
+        $this->createPage = new CreatePage(
+            $this->pages,
+            TextContentType::registry(),
+            new SequentialPageIdGenerator(),
+            $this->clock,
+        );
     }
 
-    public function testUpdatesContentPathAndStatus(): void
+    public function testUpdatesDetailsPayloadAndStatus(): void
     {
         $page = $this->create('about');
         $this->clock->moveTo('2026-11-09 08:00:00 UTC');
 
-        $updated = ($this->updatePage)(
-            new UpdatePageCommand($page->id->value, 'company/about', 'About us', '<p>New</p>', true, 'Meta', 'Description'),
-        );
+        $updated = ($this->updatePage)(new UpdatePageCommand(
+            $page->metadata->id->value,
+            'company/about',
+            'About us',
+            ['body' => '<p>New</p>'],
+            true,
+            'Meta',
+            'Description',
+        ));
 
-        $this->assertSame('company/about', $updated->path->value);
-        $this->assertSame('About us', $updated->content->title);
-        $this->assertTrue($updated->isPublished());
-        $this->assertEquals($this->clock->now(), $updated->updatedAt);
-        $this->assertEquals($page->createdAt, $updated->createdAt);
-        $this->assertSame($updated, $this->pages->get($page->id));
+        $this->assertSame('company/about', $updated->metadata->details->path->value);
+        $this->assertSame('About us', $updated->metadata->details->title);
+        $this->assertSame('Description', $updated->metadata->details->metaDescription);
+        $this->assertEquals(new TextPayload('<p>New</p>'), $updated->payload);
+        $this->assertTrue($updated->metadata->isPublished());
+        $this->assertEquals($this->clock->now(), $updated->metadata->updatedAt);
+        $this->assertEquals($page->metadata->createdAt, $updated->metadata->createdAt);
+        $this->assertSame('text', $updated->metadata->type->value);
+        $this->assertSame($updated, $this->pages->get($page->metadata->id));
     }
 
     public function testPublishedPageCanBeReturnedToDraft(): void
     {
         $page = $this->create('about');
-        ($this->updatePage)(new UpdatePageCommand($page->id->value, 'about', 'About', '', true));
+        $id = $page->metadata->id->value;
+        ($this->updatePage)(new UpdatePageCommand($id, 'about', 'About', [], true));
 
-        $draft = ($this->updatePage)(new UpdatePageCommand($page->id->value, 'about', 'About', '', false));
+        $draft = ($this->updatePage)(new UpdatePageCommand($id, 'about', 'About', [], false));
 
-        $this->assertFalse($draft->isPublished());
+        $this->assertFalse($draft->metadata->isPublished());
     }
 
     public function testPageMayKeepItsOwnPath(): void
     {
         $page = $this->create('about');
 
-        $updated = ($this->updatePage)(new UpdatePageCommand($page->id->value, 'about', 'Renamed', '', false));
+        $updated = ($this->updatePage)(
+            new UpdatePageCommand($page->metadata->id->value, 'about', 'Renamed', [], false),
+        );
 
-        $this->assertSame('Renamed', $updated->content->title);
+        $this->assertSame('Renamed', $updated->metadata->details->title);
     }
 
     public function testRejectsPathUsedByAnotherPage(): void
@@ -82,18 +102,32 @@ final class UpdatePageTest extends TestCase
 
         $this->expectException(PathAlreadyTaken::class);
 
-        ($this->updatePage)(new UpdatePageCommand($about->id->value, 'contacts', 'About', '', false));
+        ($this->updatePage)(new UpdatePageCommand($about->metadata->id->value, 'contacts', 'About', [], false));
+    }
+
+    public function testInvalidPayloadLeavesStoredPageUntouched(): void
+    {
+        $page = $this->create('about');
+
+        try {
+            ($this->updatePage)(
+                new UpdatePageCommand($page->metadata->id->value, 'about', 'About', ['body' => 42], true),
+            );
+            $this->fail('An invalid payload must be rejected.');
+        } catch (InvalidPayload) {
+            $this->assertSame($page, $this->pages->get($page->metadata->id));
+        }
     }
 
     public function testRejectsUnknownPage(): void
     {
         $this->expectException(PageNotFound::class);
 
-        ($this->updatePage)(new UpdatePageCommand('01ARZ3NDEKTSV4RRFFQ69G5FAV', 'about', 'About', '', false));
+        ($this->updatePage)(new UpdatePageCommand('01ARZ3NDEKTSV4RRFFQ69G5FAV', 'about', 'About', [], false));
     }
 
     private function create(string $path): Page
     {
-        return ($this->createPage)(new CreatePageCommand($path, ucfirst($path), ''));
+        return ($this->createPage)(new CreatePageCommand('text', $path, ucfirst($path), ['body' => '<p>Hi</p>']));
     }
 }

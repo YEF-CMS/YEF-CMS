@@ -5,53 +5,27 @@ declare(strict_types=1);
 namespace Yef\Domain\Page;
 
 use DateTimeImmutable;
+use Yef\Domain\ContentType\Payload;
 
 final readonly class Page
 {
     public function __construct(
-        public PageId $id,
-        public PagePath $path,
-        public PageContent $content,
-        public PageStatus $status,
-        public DateTimeImmutable $createdAt,
-        public DateTimeImmutable $updatedAt,
+        public PageMetadata $metadata,
+        public Payload $payload,
     ) {}
 
-    /**
-     * A new page always starts as a draft.
-     */
-    public static function create(PageId $id, PagePath $path, PageContent $content, DateTimeImmutable $now): self
+    public function edit(PageDetails $details, Payload $payload, DateTimeImmutable $now): self
     {
-        return new self($id, $path, $content, PageStatus::Draft, $now, $now);
-    }
-
-    public function moveTo(PagePath $path, DateTimeImmutable $now): self
-    {
-        return new self($this->id, $path, $this->content, $this->status, $this->createdAt, $now);
-    }
-
-    public function rewrite(PageContent $content, DateTimeImmutable $now): self
-    {
-        return new self($this->id, $this->path, $content, $this->status, $this->createdAt, $now);
+        return new self($this->metadata->revised($details, $now), $payload);
     }
 
     public function publish(DateTimeImmutable $now): self
     {
-        return $this->withStatus(PageStatus::Published, $now);
+        return new self($this->metadata->withStatus(PageStatus::Published, $now), $this->payload);
     }
 
     public function unpublish(DateTimeImmutable $now): self
     {
-        return $this->withStatus(PageStatus::Draft, $now);
-    }
-
-    public function isPublished(): bool
-    {
-        return $this->status === PageStatus::Published;
-    }
-
-    private function withStatus(PageStatus $status, DateTimeImmutable $now): self
-    {
-        return new self($this->id, $this->path, $this->content, $status, $this->createdAt, $now);
+        return new self($this->metadata->withStatus(PageStatus::Draft, $now), $this->payload);
     }
 }

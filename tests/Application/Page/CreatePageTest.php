@@ -10,11 +10,15 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Yef\Application\Page\CreatePage;
 use Yef\Application\Page\CreatePageCommand;
+use Yef\Domain\ContentType\Exception\InvalidPayload;
+use Yef\Domain\ContentType\Exception\UnknownContentType;
 use Yef\Domain\Page\Exception\PathAlreadyTaken;
 use Yef\Domain\Page\PageStatus;
 use Yef\Tests\Support\FrozenClock;
 use Yef\Tests\Support\InMemoryPageRepository;
 use Yef\Tests\Support\SequentialPageIdGenerator;
+use Yef\Tests\Support\Text\TextContentType;
+use Yef\Tests\Support\Text\TextPayload;
 
 #[CoversClass(CreatePage::class)]
 #[CoversClass(CreatePageCommand::class)]
@@ -28,46 +32,72 @@ final class CreatePageTest extends TestCase
     protected function setUp(): void
     {
         $this->pages = new InMemoryPageRepository();
-        $this->createPage = new CreatePage($this->pages, new SequentialPageIdGenerator(), new FrozenClock());
+        $this->createPage = new CreatePage(
+            $this->pages,
+            TextContentType::registry(),
+            new SequentialPageIdGenerator(),
+            new FrozenClock(),
+        );
     }
 
     public function testCreatesDraftPageAndStoresIt(): void
     {
-        $page = ($this->createPage)(new CreatePageCommand('about', 'About', '<p>Hi</p>', 'Meta', 'Description'));
+        $page = ($this->createPage)(
+            new CreatePageCommand('text', 'about', 'About', ['body' => '<p>Hi</p>'], 'Meta', 'Description'),
+        );
 
-        $this->assertSame(PageStatus::Draft, $page->status);
-        $this->assertSame('about', $page->path->value);
-        $this->assertSame('About', $page->content->title);
-        $this->assertSame('Meta', $page->content->metaTitle);
-        $this->assertSame($page, $this->pages->get($page->id));
+        $this->assertSame(PageStatus::Draft, $page->metadata->status);
+        $this->assertSame('text', $page->metadata->type->value);
+        $this->assertSame('about', $page->metadata->details->path->value);
+        $this->assertSame('About', $page->metadata->details->title);
+        $this->assertSame('Meta', $page->metadata->details->metaTitle);
+        $this->assertEquals(new TextPayload('<p>Hi</p>'), $page->payload);
+        $this->assertSame($page, $this->pages->get($page->metadata->id));
     }
 
     public function testRejectsPathUsedByAnotherPage(): void
     {
-        ($this->createPage)(new CreatePageCommand('about', 'About', ''));
+        ($this->createPage)(new CreatePageCommand('text', 'about', 'About', []));
 
         $this->expectException(PathAlreadyTaken::class);
 
-        ($this->createPage)(new CreatePageCommand('about', 'Other', ''));
+        ($this->createPage)(new CreatePageCommand('text', 'about', 'Other', []));
+    }
+
+    public function testRejectsUnknownContentType(): void
+    {
+        $this->expectException(UnknownContentType::class);
+
+        ($this->createPage)(new CreatePageCommand('gallery', 'photos', 'Photos', []));
+    }
+
+    public function testRejectsInvalidPayloadWithoutStoringAnything(): void
+    {
+        try {
+            ($this->createPage)(new CreatePageCommand('text', 'about', 'About', ['body' => 42]));
+            $this->fail('An invalid payload must be rejected.');
+        } catch (InvalidPayload) {
+            $this->assertSame([], $this->pages->allMetadata());
+        }
     }
 
     public function testRejectsInvalidPathWithoutStoringAnything(): void
     {
         try {
-            ($this->createPage)(new CreatePageCommand('Bad Path', 'Title', ''));
+            ($this->createPage)(new CreatePageCommand('text', 'Bad Path', 'Title', []));
             $this->fail('An invalid path must be rejected.');
         } catch (InvalidArgumentException) {
-            $this->assertSame([], $this->pages->all());
+            $this->assertSame([], $this->pages->allMetadata());
         }
     }
 
     public function testRejectsEmptyTitleWithoutStoringAnything(): void
     {
         try {
-            ($this->createPage)(new CreatePageCommand('about', ' ', ''));
+            ($this->createPage)(new CreatePageCommand('text', 'about', ' ', []));
             $this->fail('An empty title must be rejected.');
         } catch (InvalidArgumentException) {
-            $this->assertSame([], $this->pages->all());
+            $this->assertSame([], $this->pages->allMetadata());
         }
     }
 }

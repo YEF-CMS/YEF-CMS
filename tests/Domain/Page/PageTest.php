@@ -8,14 +8,18 @@ use DateTimeImmutable;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Yef\Domain\ContentType\ContentTypeId;
 use Yef\Domain\Page\Page;
-use Yef\Domain\Page\PageContent;
+use Yef\Domain\Page\PageDetails;
 use Yef\Domain\Page\PageId;
+use Yef\Domain\Page\PageMetadata;
 use Yef\Domain\Page\PagePath;
 use Yef\Domain\Page\PageStatus;
+use Yef\Tests\Support\Text\TextPayload;
 
 #[CoversClass(Page::class)]
-#[CoversClass(PageContent::class)]
+#[CoversClass(PageMetadata::class)]
+#[CoversClass(PageDetails::class)]
 final class PageTest extends TestCase
 {
     private const string CREATED = '2026-11-08 10:00:00 UTC';
@@ -24,11 +28,11 @@ final class PageTest extends TestCase
 
     public function testNewPageIsDraft(): void
     {
-        $page = $this->page();
+        $metadata = $this->page()->metadata;
 
-        $this->assertSame(PageStatus::Draft, $page->status);
-        $this->assertFalse($page->isPublished());
-        $this->assertEquals($page->createdAt, $page->updatedAt);
+        $this->assertSame(PageStatus::Draft, $metadata->status);
+        $this->assertFalse($metadata->isPublished());
+        $this->assertEquals($metadata->createdAt, $metadata->updatedAt);
     }
 
     public function testPublishAndUnpublishReturnNewPageAndTouchUpdatedAt(): void
@@ -38,49 +42,47 @@ final class PageTest extends TestCase
 
         $published = $draft->publish($later);
 
-        $this->assertTrue($published->isPublished());
-        $this->assertEquals($later, $published->updatedAt);
-        $this->assertEquals($draft->createdAt, $published->createdAt);
-        $this->assertFalse($draft->isPublished(), 'the original page must stay unchanged');
-        $this->assertFalse($published->unpublish($later)->isPublished());
+        $this->assertTrue($published->metadata->isPublished());
+        $this->assertEquals($later, $published->metadata->updatedAt);
+        $this->assertEquals($draft->metadata->createdAt, $published->metadata->createdAt);
+        $this->assertSame($draft->payload, $published->payload);
+        $this->assertFalse($draft->metadata->isPublished(), 'the original page must stay unchanged');
+        $this->assertFalse($published->unpublish($later)->metadata->isPublished());
     }
 
-    public function testMoveToChangesOnlyThePath(): void
+    public function testEditReplacesDetailsAndPayloadButKeepsIdentityAndStatus(): void
     {
-        $page = $this->page();
+        $page = $this->page()->publish(new DateTimeImmutable(self::CREATED));
+        $details = new PageDetails(new PagePath('blog/hello'), 'Hello', 'Meta', 'Description');
+        $payload = new TextPayload('<p>New</p>');
 
-        $moved = $page->moveTo(new PagePath('blog/hello'), new DateTimeImmutable(self::LATER));
+        $edited = $page->edit($details, $payload, new DateTimeImmutable(self::LATER));
 
-        $this->assertSame('blog/hello', $moved->path->value);
-        $this->assertSame($page->content, $moved->content);
-        $this->assertTrue($page->id->equals($moved->id));
+        $this->assertSame($details, $edited->metadata->details);
+        $this->assertSame($payload, $edited->payload);
+        $this->assertTrue($edited->metadata->id->equals($page->metadata->id));
+        $this->assertTrue($edited->metadata->type->equals($page->metadata->type));
+        $this->assertTrue($edited->metadata->isPublished());
+        $this->assertEquals(new DateTimeImmutable(self::LATER), $edited->metadata->updatedAt);
     }
 
-    public function testRewriteChangesOnlyTheContent(): void
-    {
-        $page = $this->page();
-        $content = new PageContent('New title', '<p>New</p>', 'Meta', 'Description');
-
-        $rewritten = $page->rewrite($content, new DateTimeImmutable(self::LATER));
-
-        $this->assertSame($content, $rewritten->content);
-        $this->assertSame($page->path, $rewritten->path);
-    }
-
-    public function testContentRequiresTitle(): void
+    public function testDetailsRequireTitle(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
-        new PageContent('   ', '<p>Body</p>');
+        new PageDetails(new PagePath('about'), '   ');
     }
 
     private function page(): Page
     {
-        return Page::create(
-            new PageId('01ARZ3NDEKTSV4RRFFQ69G5FAV'),
-            new PagePath('about'),
-            new PageContent('About', '<p>Hi</p>'),
-            new DateTimeImmutable(self::CREATED),
+        return new Page(
+            PageMetadata::draft(
+                new PageId('01ARZ3NDEKTSV4RRFFQ69G5FAV'),
+                new ContentTypeId('text'),
+                new PageDetails(new PagePath('about'), 'About'),
+                new DateTimeImmutable(self::CREATED),
+            ),
+            new TextPayload('<p>Hi</p>'),
         );
     }
 }
