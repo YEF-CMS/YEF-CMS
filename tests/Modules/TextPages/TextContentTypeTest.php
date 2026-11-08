@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yef\Tests\Support\Text;
+namespace Yef\Tests\Modules\TextPages;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -10,6 +10,11 @@ use PHPUnit\Framework\TestCase;
 use Yef\Domain\ContentType\Exception\InvalidPayload;
 use Yef\Domain\ContentType\Payload;
 use Yef\Domain\ContentType\PayloadData;
+use YefCms\TextPages\TextContentRenderer;
+use YefCms\TextPages\TextContentType;
+use YefCms\TextPages\TextPayload;
+use YefCms\TextPages\TextPayloadFactory;
+use YefCms\TextPages\TextPayloadSerializer;
 
 /**
  * Checks the behavior every content type has to provide, using the reference text type.

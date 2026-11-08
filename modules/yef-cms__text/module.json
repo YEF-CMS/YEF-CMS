@@ -1,0 +1,11 @@
+{
+    "name": "yef-cms/text",
+    "title": "Text pages",
+    "description": "Pages whose content is a single HTML body.",
+    "version": "0.1.0",
+    "license": "GPL-2.0-or-later",
+    "namespace": "YefCms\\TextPages\\",
+    "requires": {
+        "yef": "^0.1"
+    }
+}

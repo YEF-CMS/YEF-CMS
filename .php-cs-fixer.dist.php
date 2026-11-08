@@ -10,6 +10,7 @@ $finder = (new Finder())
         __DIR__ . '/config',
         __DIR__ . '/public',
         __DIR__ . '/src',
+        __DIR__ . '/modules',
         __DIR__ . '/tests',
     ])
     ->exclude(['.merge-plan.php'])

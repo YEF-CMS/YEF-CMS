@@ -54,7 +54,8 @@
     },
     "autoload": {
         "psr-4": {
-            "Yef\\": "src/"
+            "Yef\\": "src/",
+            "YefCms\\TextPages\\": "modules/yef-cms__text/src/"
         }
     },
     "autoload-dev": {

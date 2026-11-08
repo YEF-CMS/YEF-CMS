@@ -15,8 +15,8 @@ use Yef\Storage\PageScan;
 use Yef\Storage\PageScanner;
 use Yef\Storage\StorageLayout;
 use Yef\Tests\Support\TemporaryDirectory;
-use Yef\Tests\Support\Text\TextContentType;
 use Yef\Tests\Support\TextPages;
+use YefCms\TextPages\TextContentType;
 
 #[CoversClass(FilePageIntegrity::class)]
 #[CoversClass(IntegrityReport::class)]

@@ -18,8 +18,8 @@ use Yef\Domain\Page\PageMetadata;
 use Yef\Domain\Page\PagePath;
 use Yef\Domain\Page\PageRepository;
 use Yef\Domain\Page\PageStatus;
-use Yef\Tests\Support\Text\TextContentType;
-use Yef\Tests\Support\Text\TextPayload;
+use YefCms\TextPages\TextContentType;
+use YefCms\TextPages\TextPayload;
 
 /**
  * Behavior every PageRepository implementation has to provide, whatever it stores pages in.

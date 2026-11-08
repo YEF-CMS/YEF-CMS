@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 use Yef\Domain\ContentType\ContentTypeId;
 use Yef\Domain\ContentType\ContentTypeRegistry;
 use Yef\Domain\ContentType\Exception\UnknownContentType;
-use Yef\Tests\Support\Text\TextContentType;
+use YefCms\TextPages\TextContentType;
 
 #[CoversClass(ContentTypeRegistry::class)]
 #[CoversClass(UnknownContentType::class)]

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Yef\Tests\Support\Text;
+namespace YefCms\TextPages;
 
 use Override;
 use Yef\Domain\ContentType\Exception\InvalidPayload;

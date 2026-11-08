@@ -2,6 +2,7 @@
 deptrac:
   paths:
     - ./src
+    - ./modules
   layers:
     - name: Domain
       collectors:
@@ -30,6 +31,10 @@ deptrac:
     - name: Setup
       collectors:
         - { type: directory, value: src/Setup/.* }
+    # Installable modules: they may only use the public content type contract.
+    - name: Modules
+      collectors:
+        - { type: directory, value: modules/.* }
     # Vendor code
     - name: Psr
       collectors:
@@ -72,3 +77,6 @@ deptrac:
       - Psr
       - Framework
     Setup: []
+    Modules:
+      - Domain
+      - Psr

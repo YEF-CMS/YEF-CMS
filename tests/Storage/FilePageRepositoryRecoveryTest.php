@@ -20,8 +20,8 @@ use Yef\Domain\Page\PagePath;
 use Yef\Storage\FilePageRepository;
 use Yef\Storage\StorageLayout;
 use Yef\Tests\Support\TemporaryDirectory;
-use Yef\Tests\Support\Text\TextContentType;
-use Yef\Tests\Support\Text\TextPayload;
+use YefCms\TextPages\TextContentType;
+use YefCms\TextPages\TextPayload;
 
 /**
  * What only the file storage promises: it survives interrupted writes, lost indexes and parallel requests.

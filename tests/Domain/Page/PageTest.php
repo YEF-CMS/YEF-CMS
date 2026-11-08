@@ -15,7 +15,7 @@ use Yef\Domain\Page\PageId;
 use Yef\Domain\Page\PageMetadata;
 use Yef\Domain\Page\PagePath;
 use Yef\Domain\Page\PageStatus;
-use Yef\Tests\Support\Text\TextPayload;
+use YefCms\TextPages\TextPayload;
 
 #[CoversClass(Page::class)]
 #[CoversClass(PageMetadata::class)]

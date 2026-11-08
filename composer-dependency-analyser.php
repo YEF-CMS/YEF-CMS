@@ -7,6 +7,7 @@ use ShipMonk\ComposerDependencyAnalyser\Config\ErrorType;
 
 return (new Configuration())
     ->addPathToScan(__DIR__ . '/src', isDev: false)
+    ->addPathToScan(__DIR__ . '/modules', isDev: false)
     ->addPathToScan(__DIR__ . '/public', isDev: false)
     ->addPathToScan(__DIR__ . '/config', isDev: false)
     ->addPathToScan(__DIR__ . '/tests', isDev: true)

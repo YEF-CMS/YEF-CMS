@@ -15,7 +15,7 @@ use Yef\Storage\PageMetadataRecord;
 use Yef\Storage\StorageIoFailure;
 use Yef\Storage\StorageLayout;
 use Yef\Tests\Support\TemporaryDirectory;
-use Yef\Tests\Support\Text\TextContentType;
+use YefCms\TextPages\TextContentType;
 
 #[CoversClass(FilePageRepository::class)]
 #[CoversClass(Files::class)]

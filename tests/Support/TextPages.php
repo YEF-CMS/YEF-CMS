@@ -11,8 +11,8 @@ use Yef\Domain\Page\PageDetails;
 use Yef\Domain\Page\PageId;
 use Yef\Domain\Page\PageMetadata;
 use Yef\Domain\Page\PagePath;
-use Yef\Tests\Support\Text\TextContentType;
-use Yef\Tests\Support\Text\TextPayload;
+use YefCms\TextPages\TextContentType;
+use YefCms\TextPages\TextPayload;
 
 /**
  * Builds pages of the reference text type for tests.

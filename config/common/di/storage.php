@@ -10,6 +10,7 @@ use Yef\Storage\FilePageIntegrity;
 use Yef\Storage\FilePageRepository;
 use Yef\Storage\StorageLayout;
 use Yef\Storage\UlidPageIdGenerator;
+use YefCms\TextPages\TextContentType;
 use Yiisoft\Aliases\Aliases;
 
 return [
@@ -17,10 +18,11 @@ return [
         $aliases->get('@content') . '/pages',
         $aliases->get('@runtime') . '/storage',
     ),
-    // No content types are registered until the module loader exists; pages then read as unavailable.
-    ContentTypeRegistry::class => [
-        '__construct()' => [[]],
-    ],
+    // Until the module loader exists, the bundled text module is registered by hand;
+    // pages of any other type read as unavailable.
+    ContentTypeRegistry::class => static fn(): ContentTypeRegistry => new ContentTypeRegistry([
+        TextContentType::definition(),
+    ]),
     PageRepository::class => FilePageRepository::class,
     PageStorageIntegrity::class => FilePageIntegrity::class,
     PageIdGenerator::class => UlidPageIdGenerator::class,

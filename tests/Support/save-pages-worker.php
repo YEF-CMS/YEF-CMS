@@ -16,8 +16,8 @@ use Yef\Domain\Page\PagePath;
 use Yef\Storage\FilePageRepository;
 use Yef\Storage\StorageLayout;
 use Yef\Storage\UlidPageIdGenerator;
-use Yef\Tests\Support\Text\TextContentType;
-use Yef\Tests\Support\Text\TextPayload;
+use YefCms\TextPages\TextContentType;
+use YefCms\TextPages\TextPayload;
 
 require dirname(__DIR__, 2) . '/vendor/autoload.php';
 

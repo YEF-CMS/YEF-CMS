@@ -17,8 +17,8 @@ use Yef\Domain\Page\PageStatus;
 use Yef\Tests\Support\FrozenClock;
 use Yef\Tests\Support\InMemoryPageRepository;
 use Yef\Tests\Support\SequentialPageIdGenerator;
-use Yef\Tests\Support\Text\TextContentType;
-use Yef\Tests\Support\Text\TextPayload;
+use YefCms\TextPages\TextContentType;
+use YefCms\TextPages\TextPayload;
 
 #[CoversClass(CreatePage::class)]
 #[CoversClass(CreatePageCommand::class)]

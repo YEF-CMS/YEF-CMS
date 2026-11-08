@@ -16,7 +16,7 @@ use Yef\Domain\Page\PageMetadata;
 use Yef\Tests\Support\FrozenClock;
 use Yef\Tests\Support\InMemoryPageRepository;
 use Yef\Tests\Support\SequentialPageIdGenerator;
-use Yef\Tests\Support\Text\TextContentType;
+use YefCms\TextPages\TextContentType;
 
 #[CoversClass(DeletePage::class)]
 #[CoversClass(ListPages::class)]
