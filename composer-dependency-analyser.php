@@ -21,7 +21,6 @@ return (new Configuration())
     ->ignoreErrorsOnPackages(
         [
             'psr/container',
-            'twig/twig',
             'yiisoft/config',
             'yiisoft/di',
             'yiisoft/router-fastroute',

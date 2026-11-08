@@ -56,7 +56,7 @@ final class DeleteAndListPagesTest extends TestCase
     {
         $page = $this->createPage->handle(new CreatePageCommand('text', 'about', 'About', []));
 
-        new DeletePage($this->pages)->handle($page->metadata->id->value);
+        $this->deletePage()->handle($page->metadata->id->value);
 
         $this->assertSame([], $this->pages->allMetadata());
     }
@@ -65,6 +65,6 @@ final class DeleteAndListPagesTest extends TestCase
     {
         $this->expectException(PageNotFound::class);
 
-        new DeletePage($this->pages)->handle('01ARZ3NDEKTSV4RRFFQ69G5FAV');
+        $this->deletePage()->handle('01ARZ3NDEKTSV4RRFFQ69G5FAV');
     }
 }

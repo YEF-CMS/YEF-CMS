@@ -6,6 +6,8 @@ return [
     '@root' => dirname(__DIR__, 2),
     '@src' => '@root/src',
     '@public' => '@root/public',
+    // Site layout and other templates of the site owner.
+    '@templates' => '@root/templates',
     '@vendor' => '@root/vendor',
     // Writable runtime data: caches, logs, locks. Never served directly.
     '@runtime' => '@root/var',

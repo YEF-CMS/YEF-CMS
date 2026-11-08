@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ page.metaTitle != '' ? page.metaTitle : page.title }}</title>
+{% if page.metaDescription != '' %}
+<meta name="description" content="{{ page.metaDescription }}">
+{% endif %}
+{{ assets_head() }}
+</head>
+<body>
+{{ region('main') }}
+{{ assets_footer() }}
+</body>
+</html>

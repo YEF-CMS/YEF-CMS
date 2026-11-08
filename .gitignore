@@ -26,3 +26,7 @@ Thumbs.db
 
 # Site content (the owner's data, not part of the code)
 /content/
+
+# Generated site: pages are published here, only the entry points are code
+/public/*
+!/public/admin/
