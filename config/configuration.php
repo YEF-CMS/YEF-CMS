@@ -37,7 +37,7 @@ return [
         'events-console' => ['$events'],
         'routes' => 'common/routes.php',
         'bootstrap' => 'common/bootstrap.php',
-        'bootstrap-web' => '$bootstrap',
+        'bootstrap-web' => ['$bootstrap', 'web/bootstrap.php'],
         'bootstrap-console' => '$bootstrap',
     ],
     'config-plugin-environments' => [

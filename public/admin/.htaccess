@@ -1,0 +1,10 @@
+# Sends every request that is not a real file to the admin entry point, so addresses look like /admin/login.
+# Without this file (or without mod_rewrite) the admin still works at /admin/index.php/login.
+DirectoryIndex index.php
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
+</IfModule>

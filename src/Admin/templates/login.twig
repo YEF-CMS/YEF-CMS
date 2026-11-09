@@ -1,0 +1,23 @@
+{% extends 'auth.twig' %}
+
+{% block title %}{{ t('login.title') }} · {{ t('app.name') }}{% endblock %}
+
+{% block heading %}{{ t('login.title') }}{% endblock %}
+
+{% block form %}
+{% if error %}
+    <div class="alert alert-danger" role="alert">{{ t(error) }}</div>
+{% endif %}
+<form method="post" action="{{ url('admin.login') }}">
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+    <div class="mb-3">
+        <label for="login" class="form-label">{{ t('login.login') }}</label>
+        <input type="text" class="form-control" id="login" name="login" value="{{ login }}" autocomplete="username" autofocus required>
+    </div>
+    <div class="mb-4">
+        <label for="password" class="form-label">{{ t('login.password') }}</label>
+        <input type="password" class="form-control" id="password" name="password" autocomplete="current-password" required>
+    </div>
+    <button type="submit" class="btn btn-primary w-100">{{ t('login.submit') }}</button>
+</form>
+{% endblock %}

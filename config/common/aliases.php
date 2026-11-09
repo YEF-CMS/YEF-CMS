@@ -13,6 +13,8 @@ return [
     '@runtime' => '@root/var',
     // Site content: pages and, later, media. The data of the site owner, never part of a release.
     '@content' => '@root/content',
+    // Internal data that cannot be recreated: users and, later, roles and settings. Never part of a release.
+    '@data' => '@root/data',
     // Site settings that are part of the installation, such as the list of enabled modules.
     '@config' => '@root/config',
     // Installed modules, one directory each.

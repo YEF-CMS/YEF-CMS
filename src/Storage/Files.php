@@ -7,6 +7,7 @@ namespace Yef\Storage;
 use DirectoryIterator;
 
 use function bin2hex;
+use function chmod;
 use function file_get_contents;
 use function file_put_contents;
 use function is_dir;
@@ -16,6 +17,7 @@ use function mkdir;
 use function random_bytes;
 use function rename;
 use function rmdir;
+use function touch;
 use function unlink;
 
 /**
@@ -52,6 +54,23 @@ final readonly class Files
     {
         $temporary = $path . '.tmp-' . bin2hex(random_bytes(6));
         if (file_put_contents($temporary, $contents) === false) {
+            $this->removeFile($temporary);
+
+            throw StorageIoFailure::during('write', $path);
+        }
+
+        $this->move($temporary, $path);
+    }
+
+    /**
+     * Like `writeAtomically`, for secrets: the file is readable by its owner only, from the moment it exists.
+     *
+     * @throws StorageIoFailure
+     */
+    public function writePrivately(string $path, string $contents): void
+    {
+        $temporary = $path . '.tmp-' . bin2hex(random_bytes(6));
+        if (!touch($temporary) || !chmod($temporary, 0o600) || file_put_contents($temporary, $contents) === false) {
             $this->removeFile($temporary);
 
             throw StorageIoFailure::during('write', $path);

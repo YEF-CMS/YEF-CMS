@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <title>{% block title %}{{ t('app.name') }}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ assetsUrl }}/vendor/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ assetsUrl }}/admin.css">
+</head>
+<body class="{% block body_class %}{% endblock %}">
+{% block body %}{% endblock %}
+<script src="{{ assetsUrl }}/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+</body>
+</html>

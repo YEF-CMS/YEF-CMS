@@ -1,0 +1,30 @@
+{% extends 'base.twig' %}
+
+{% block title %}{% block page_title %}{% endblock %} · {{ t('app.name') }}{% endblock %}
+
+{% block body_class %}yef-admin{% endblock %}
+
+{% block body %}
+<nav class="navbar navbar-dark bg-dark yef-topbar">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{{ url('admin.dashboard') }}">{{ t('app.name') }}</a>
+        <form method="post" action="{{ url('admin.logout') }}" class="d-flex align-items-center gap-3 m-0">
+            <span class="navbar-text">{{ t('nav.signed_in_as', {login: login}) }}</span>
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+            <button type="submit" class="btn btn-outline-light btn-sm">{{ t('nav.logout') }}</button>
+        </form>
+    </div>
+</nav>
+<div class="yef-shell">
+    <aside class="yef-sidebar border-end bg-body-tertiary">
+        <ul class="nav nav-pills flex-column p-3 gap-1">
+            <li class="nav-item">
+                <a class="nav-link {% block nav_dashboard %}{% endblock %}" href="{{ url('admin.dashboard') }}">{{ t('nav.dashboard') }}</a>
+            </li>
+        </ul>
+    </aside>
+    <main class="yef-content p-4">
+        {% block content %}{% endblock %}
+    </main>
+</div>
+{% endblock %}

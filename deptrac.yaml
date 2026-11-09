@@ -31,6 +31,10 @@ deptrac:
     - name: Setup
       collectors:
         - { type: directory, value: src/Setup/.* }
+    # Adapters to the system the code runs on: time, password hashing.
+    - name: Platform
+      collectors:
+        - { type: directory, value: src/Platform/.* }
     # Installable modules: they may only use the public content type contract.
     - name: Modules
       collectors:
@@ -77,6 +81,10 @@ deptrac:
       - Psr
       - Framework
     Setup: []
+    Platform:
+      - Domain
+      - Psr
+      - Framework
     Modules:
       - Domain
       - Psr

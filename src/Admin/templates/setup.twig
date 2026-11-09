@@ -1,0 +1,30 @@
+{% extends 'auth.twig' %}
+
+{% block title %}{{ t('setup.title') }} · {{ t('app.name') }}{% endblock %}
+
+{% block heading %}{{ t('setup.title') }}{% endblock %}
+
+{% block form %}
+<p>{{ t('setup.intro') }}</p>
+{% if error %}
+    <div class="alert alert-danger" role="alert">{{ t(error[0], error[1]) }}</div>
+{% endif %}
+<form method="post" action="{{ url('admin.setup') }}">
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+    <div class="mb-3">
+        <label for="code" class="form-label">{{ t('setup.code') }}</label>
+        <input type="text" class="form-control font-monospace" id="code" name="code" autocomplete="off" autofocus required>
+        <div class="form-text">{{ t('setup.code_hint', {file: 'var/setup-token'}) }}</div>
+    </div>
+    <div class="mb-3">
+        <label for="login" class="form-label">{{ t('login.login') }}</label>
+        <input type="text" class="form-control" id="login" name="login" value="{{ login }}" autocomplete="username" required>
+    </div>
+    <div class="mb-4">
+        <label for="password" class="form-label">{{ t('login.password') }}</label>
+        <input type="password" class="form-control" id="password" name="password" autocomplete="new-password" required>
+        <div class="form-text">{{ t('setup.password_hint', {min: minPasswordLength}) }}</div>
+    </div>
+    <button type="submit" class="btn btn-primary w-100">{{ t('setup.submit') }}</button>
+</form>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends 'base.twig' %}
+
+{% block body_class %}yef-auth bg-body-tertiary{% endblock %}
+
+{% block body %}
+<main class="yef-auth-card card shadow-sm">
+    <div class="card-body p-4">
+        <h1 class="h4 mb-1">{{ t('app.name') }}</h1>
+        <p class="text-body-secondary mb-4">{% block heading %}{% endblock %}</p>
+        {% block form %}{% endblock %}
+    </div>
+</main>
+{% endblock %}

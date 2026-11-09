@@ -13,4 +13,6 @@ return [
     'yef:modules' => Console\ListModulesCommand::class,
     'yef:module:enable' => Console\EnableModuleCommand::class,
     'yef:module:disable' => Console\DisableModuleCommand::class,
+    'yef:user:create' => Console\CreateUserCommand::class,
+    'yef:user:password' => Console\ChangeUserPasswordCommand::class,
 ];

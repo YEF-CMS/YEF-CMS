@@ -20,7 +20,6 @@ return (new Configuration())
     )
     ->ignoreErrorsOnPackages(
         [
-            'psr/container',
             'yiisoft/config',
             'yiisoft/di',
             'yiisoft/router-fastroute',

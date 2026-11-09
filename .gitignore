@@ -27,6 +27,9 @@ Thumbs.db
 # Site content (the owner's data, not part of the code)
 /content/
 
+# Internal data that cannot be recreated: users and, later, roles and settings
+/data/
+
 # Generated site: pages are published here, only the entry points are code
 /public/*
 !/public/admin/
