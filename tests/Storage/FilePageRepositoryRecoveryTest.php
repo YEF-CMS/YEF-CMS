@@ -81,6 +81,36 @@ final class FilePageRepositoryRecoveryTest extends TestCase
         $this->assertFileExists($this->indexFile());
     }
 
+    public function testVersionsAreTheSameAfterTheIndexIsRebuilt(): void
+    {
+        $this->repository()->save($this->textPage(self::FIRST_ID, 'about', '<p>A</p>'));
+        $this->repository()->save($this->textPage(self::SECOND_ID, 'blog/post', '<p>B</p>'));
+        $before = $this->repository()->all();
+        unlink($this->indexFile());
+
+        $this->assertEquals($before, $this->repository()->all());
+    }
+
+    public function testIndexWithoutVersionsIsRebuilt(): void
+    {
+        $page = $this->textPage(self::FIRST_ID, 'about', '<p>A</p>');
+        $this->repository()->save($page);
+        $version = $this->repository()->versionOf($page->metadata->id);
+        file_put_contents($this->indexFile(), json_encode(['version' => 1, 'pages' => [[
+            'id' => self::FIRST_ID,
+            'type' => 'text',
+            'path' => 'about',
+            'title' => 'Title of about',
+            'meta_title' => '',
+            'meta_description' => '',
+            'status' => 'draft',
+            'created_at' => '2026-11-08T12:00:00.000000+00:00',
+            'updated_at' => '2026-11-08T12:00:00.000000+00:00',
+        ]]], JSON_THROW_ON_ERROR));
+
+        $this->assertEquals($version, $this->repository()->versionOf($page->metadata->id));
+    }
+
     public function testIndexIsRebuiltWhenItIsDamaged(): void
     {
         $page = $this->textPage(self::FIRST_ID, 'about', '<p>A</p>');

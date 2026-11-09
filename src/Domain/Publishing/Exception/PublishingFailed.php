@@ -20,6 +20,11 @@ final class PublishingFailed extends RuntimeException
         return new self(sprintf('Could not publish "%s".', $path), 0, $previous);
     }
 
+    public static function whileRecording(?Throwable $previous = null): self
+    {
+        return new self('Could not update the record of published pages.', 0, $previous);
+    }
+
     public static function whileRemoving(PublicPath $path, ?Throwable $previous = null): self
     {
         return new self(sprintf('Could not remove "%s".', $path), 0, $previous);

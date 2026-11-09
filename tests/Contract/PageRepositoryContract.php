@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yef\Tests\Contract;
 
 use DateTimeImmutable;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Yef\Domain\ContentType\ContentTypeId;
 use Yef\Domain\ContentType\PayloadData;
@@ -18,6 +19,7 @@ use Yef\Domain\Page\PageMetadata;
 use Yef\Domain\Page\PagePath;
 use Yef\Domain\Page\PageRepository;
 use Yef\Domain\Page\PageStatus;
+use Yef\Domain\Page\PageVersions;
 use YefCms\TextPages\TextContentType;
 use YefCms\TextPages\TextPayload;
 
@@ -192,9 +194,85 @@ abstract class PageRepositoryContract extends TestCase
         $this->assertSame(['photos' => '[1,2]', 'layout' => 'grid'], $restored->payload->data->parts());
     }
 
-    abstract protected function createRepository(): PageRepository;
+    public function testSavingTheSamePageAgainKeepsItsVersion(): void
+    {
+        $repository = $this->createRepository();
+        $page = $this->textPage(self::FIRST_ID, 'about', '<p>A</p>');
+        $repository->save($page);
+        $before = $repository->versionOf($page->metadata->id);
+
+        $repository->save(new Page($page->metadata->revised($page->metadata->details, new DateTimeImmutable('2027-01-01 00:00:00 UTC')), $page->payload));
+
+        $this->assertTrue($before->equals($repository->versionOf($page->metadata->id)));
+    }
+
+    /**
+     * @return iterable<string, array{Page}>
+     */
+    public static function changedPages(): iterable
+    {
+        $now = new DateTimeImmutable('2027-01-01 00:00:00 UTC');
+        $original = self::pageOf(self::FIRST_ID, 'about', '<p>A</p>');
+
+        yield 'text' => [self::pageOf(self::FIRST_ID, 'about', '<p>B</p>')];
+        yield 'title' => [$original->edit(new PageDetails(new PagePath('about'), 'Other title'), $original->payload, $now)];
+        yield 'address' => [self::pageOf(self::FIRST_ID, 'about-us', '<p>A</p>')];
+        yield 'meta description' => [$original->edit(new PageDetails(new PagePath('about'), 'Title of about', '', 'New'), $original->payload, $now)];
+        yield 'status' => [$original->publish($now)];
+    }
+
+    #[DataProvider('changedPages')]
+    public function testEditorChangesChangeTheVersion(Page $changed): void
+    {
+        $repository = $this->createRepository();
+        $repository->save(self::pageOf(self::FIRST_ID, 'about', '<p>A</p>'));
+
+        $before = $repository->versionOf(new PageId(self::FIRST_ID));
+
+        $repository->save($changed);
+
+        $this->assertFalse($before->equals($repository->versionOf(new PageId(self::FIRST_ID))));
+    }
+
+    public function testListsVersionOfEveryPage(): void
+    {
+        $repository = $this->createRepository();
+        $repository->save($this->textPage(self::FIRST_ID, 'about', '<p>A</p>'));
+        $repository->save($this->textPage(self::SECOND_ID, 'contacts', '<p>B</p>'));
+
+        $versions = $repository->all();
+
+        $this->assertSame([self::FIRST_ID, self::SECOND_ID], array_keys($versions));
+        $first = $repository->versionOf(new PageId(self::FIRST_ID));
+        $second = $repository->versionOf(new PageId(self::SECOND_ID));
+        $this->assertEquals([self::FIRST_ID => $first, self::SECOND_ID => $second], $versions);
+        $this->assertFalse($first->equals($second));
+    }
+
+    public function testVersionOfMissingPageIsReported(): void
+    {
+        $this->expectException(PageNotFound::class);
+
+        $this->createRepository()->versionOf(new PageId(self::FIRST_ID));
+    }
+
+    public function testDeletedPageHasNoVersion(): void
+    {
+        $repository = $this->createRepository();
+        $repository->save($this->textPage(self::FIRST_ID, 'about', '<p>A</p>'));
+        $repository->delete(new PageId(self::FIRST_ID));
+
+        $this->assertSame([], $repository->all());
+    }
+
+    abstract protected function createRepository(): PageRepository&PageVersions;
 
     protected function textPage(string $id, string $path, string $html): Page
+    {
+        return self::pageOf($id, $path, $html);
+    }
+
+    private static function pageOf(string $id, string $path, string $html): Page
     {
         return new Page(
             PageMetadata::draft(

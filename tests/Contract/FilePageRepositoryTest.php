@@ -6,7 +6,6 @@ namespace Yef\Tests\Contract;
 
 use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
-use Yef\Domain\Page\PageRepository;
 use Yef\Storage\FileLock;
 use Yef\Storage\FilePageRepository;
 use Yef\Storage\Files;
@@ -40,7 +39,7 @@ final class FilePageRepositoryTest extends PageRepositoryContract
     }
 
     #[Override]
-    protected function createRepository(): PageRepository
+    protected function createRepository(): FilePageRepository
     {
         return new FilePageRepository(
             new StorageLayout($this->directory->path . '/content/pages', $this->directory->path . '/var/storage'),

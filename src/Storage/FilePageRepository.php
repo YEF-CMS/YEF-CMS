@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Yef\Storage;
 
-use DirectoryIterator;
 use InvalidArgumentException;
 use JsonException;
 use Override;
@@ -15,6 +14,7 @@ use Yef\Domain\ContentType\Exception\InvalidPayload;
 use Yef\Domain\ContentType\Payload;
 use Yef\Domain\ContentType\PayloadData;
 use Yef\Domain\ContentType\UnavailablePayload;
+use Yef\Domain\Page\ContentVersion;
 use Yef\Domain\Page\Exception\PageDataCorrupted;
 use Yef\Domain\Page\Exception\PageNotFound;
 use Yef\Domain\Page\Exception\PageStorageFailed;
@@ -24,6 +24,7 @@ use Yef\Domain\Page\PageId;
 use Yef\Domain\Page\PageMetadata;
 use Yef\Domain\Page\PagePath;
 use Yef\Domain\Page\PageRepository;
+use Yef\Domain\Page\PageVersions;
 
 use function array_values;
 use function bin2hex;
@@ -40,7 +41,7 @@ use function random_bytes;
  *
  * @psalm-api Wired in through the DI configuration.
  */
-final readonly class FilePageRepository implements PageRepository
+final readonly class FilePageRepository implements PageRepository, PageVersions
 {
     private const int JSON_FLAGS = \JSON_THROW_ON_ERROR | \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE;
 
@@ -88,9 +89,9 @@ final readonly class FilePageRepository implements PageRepository
     #[Override]
     public function findMetadataByPath(PagePath $path): ?PageMetadata
     {
-        foreach ($this->listedPages() as $metadata) {
-            if ($metadata->details->path->equals($path)) {
-                return $metadata;
+        foreach ($this->listedPages() as $page) {
+            if ($page->metadata->details->path->equals($path)) {
+                return $page->metadata;
             }
         }
 
@@ -100,7 +101,30 @@ final readonly class FilePageRepository implements PageRepository
     #[Override]
     public function allMetadata(): array
     {
-        return $this->listedPages();
+        return array_map(static fn(IndexedPage $page): PageMetadata => $page->metadata, $this->listedPages());
+    }
+
+    #[Override]
+    public function versionOf(PageId $id): ContentVersion
+    {
+        foreach ($this->listedPages() as $page) {
+            if ($page->metadata->id->equals($id)) {
+                return $page->version;
+            }
+        }
+
+        throw PageNotFound::withId($id);
+    }
+
+    #[Override]
+    public function all(): array
+    {
+        $versions = [];
+        foreach ($this->listedPages() as $page) {
+            $versions[$page->metadata->id->value] = $page->version;
+        }
+
+        return $versions;
     }
 
     #[Override]
@@ -123,10 +147,11 @@ final readonly class FilePageRepository implements PageRepository
         $pages = $this->indexedPages();
         $this->assertPathIsFree($pages, $metadata);
 
+        $data = $this->dataOf($page);
         $directory = $this->layout->pageDirectory($metadata->id);
         $staging = $directory . '.new-' . $this->uniqueSuffix();
         try {
-            $this->writePage($staging, $metadata, $this->dataOf($page));
+            $this->writePage($staging, $metadata, $data);
             $displaced = $this->replaceDirectory($staging, $directory);
         } catch (Throwable $throwable) {
             $this->removeQuietly($staging);
@@ -134,7 +159,7 @@ final readonly class FilePageRepository implements PageRepository
             throw $throwable;
         }
 
-        $this->storeIndex($this->withEntry($pages, $metadata));
+        $this->storeIndex($this->withEntry($pages, new IndexedPage($metadata, ContentVersion::of($metadata, $data))));
         $this->removeQuietly($displaced);
     }
 
@@ -175,34 +200,10 @@ final readonly class FilePageRepository implements PageRepository
                 throw new InvalidArgumentException('Stored metadata belongs to another page.');
             }
 
-            $data = new PayloadData($this->readParts($this->layout->payloadDirectory($directory)));
-
-            return new Page($metadata, $this->payloadOf($metadata->type, $data));
+            return new Page($metadata, $this->payloadOf($metadata->type, $this->scanner->readPayload($directory)));
         } catch (JsonException|InvalidArgumentException|InvalidPayload $failure) {
             throw PageDataCorrupted::forPage($id, $failure);
         }
-    }
-
-    /**
-     * @return array<string, string>
-     *
-     * @throws StorageIoFailure
-     */
-    private function readParts(string $directory): array
-    {
-        $parts = [];
-        if (!is_dir($directory)) {
-            return $parts;
-        }
-
-        foreach (new DirectoryIterator($directory) as $file) {
-            $part = $file->isFile() ? $this->layout->partNameOf($file->getFilename()) : null;
-            if ($part !== null) {
-                $parts[$part] = $this->files->read($file->getPathname());
-            }
-        }
-
-        return $parts;
     }
 
     private function payloadOf(ContentTypeId $type, PayloadData $data): Payload
@@ -265,46 +266,47 @@ final readonly class FilePageRepository implements PageRepository
     }
 
     /**
-     * @param list<PageMetadata> $pages
+     * @param list<IndexedPage> $pages
      *
      * @throws PathAlreadyTaken
      */
     private function assertPathIsFree(array $pages, PageMetadata $metadata): void
     {
         foreach ($pages as $other) {
-            if ($other->details->path->equals($metadata->details->path) && !$other->id->equals($metadata->id)) {
+            $otherMetadata = $other->metadata;
+            if ($otherMetadata->details->path->equals($metadata->details->path) && !$otherMetadata->id->equals($metadata->id)) {
                 throw PathAlreadyTaken::byPath($metadata->details->path);
             }
         }
     }
 
     /**
-     * @param list<PageMetadata> $pages
+     * @param list<IndexedPage> $pages
      *
-     * @return list<PageMetadata>
+     * @return list<IndexedPage>
      */
-    private function withEntry(array $pages, PageMetadata $metadata): array
+    private function withEntry(array $pages, IndexedPage $entry): array
     {
-        $others = $this->withoutEntry($pages, $metadata->id);
-        $others[] = $metadata;
+        $others = $this->withoutEntry($pages, $entry->metadata->id);
+        $others[] = $entry;
 
         return $others;
     }
 
     /**
-     * @param list<PageMetadata> $pages
+     * @param list<IndexedPage> $pages
      *
-     * @return list<PageMetadata>
+     * @return list<IndexedPage>
      */
     private function withoutEntry(array $pages, PageId $id): array
     {
-        return array_values(array_filter($pages, static fn(PageMetadata $page): bool => !$page->id->equals($id)));
+        return array_values(array_filter($pages, static fn(IndexedPage $page): bool => !$page->metadata->id->equals($id)));
     }
 
     /**
      * An index that cannot be written is discarded, so the next reader rebuilds it instead of trusting a stale one.
      *
-     * @param list<PageMetadata> $pages
+     * @param list<IndexedPage> $pages
      *
      * @throws StorageIoFailure
      * @throws JsonException
@@ -321,7 +323,7 @@ final readonly class FilePageRepository implements PageRepository
     }
 
     /**
-     * @return list<PageMetadata>
+     * @return list<IndexedPage>
      */
     private function listedPages(): array
     {
@@ -335,7 +337,7 @@ final readonly class FilePageRepository implements PageRepository
     /**
      * Must be called under the lock.
      *
-     * @return list<PageMetadata>
+     * @return list<IndexedPage>
      *
      * @throws StorageIoFailure
      * @throws JsonException
@@ -348,7 +350,7 @@ final readonly class FilePageRepository implements PageRepository
     /**
      * Pages whose metadata cannot be read are left out of the index; they stay on disk untouched.
      *
-     * @return list<PageMetadata>
+     * @return list<IndexedPage>
      *
      * @throws StorageIoFailure
      * @throws JsonException

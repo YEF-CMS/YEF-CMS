@@ -6,8 +6,11 @@ use Yef\Domain\ContentType\ContentTypeRegistry;
 use Yef\Domain\Page\PageIdGenerator;
 use Yef\Domain\Page\PageRepository;
 use Yef\Domain\Page\PageStorageIntegrity;
+use Yef\Domain\Page\PageVersions;
+use Yef\Domain\Publishing\PublishedPages;
 use Yef\Storage\FilePageIntegrity;
 use Yef\Storage\FilePageRepository;
+use Yef\Storage\FilePublishedPages;
 use Yef\Storage\StorageLayout;
 use Yef\Storage\UlidPageIdGenerator;
 use YefCms\TextPages\TextContentType;
@@ -24,6 +27,8 @@ return [
         TextContentType::definition(),
     ]),
     PageRepository::class => FilePageRepository::class,
+    PageVersions::class => FilePageRepository::class,
+    PublishedPages::class => FilePublishedPages::class,
     PageStorageIntegrity::class => FilePageIntegrity::class,
     PageIdGenerator::class => UlidPageIdGenerator::class,
 ];

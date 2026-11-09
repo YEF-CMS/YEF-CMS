@@ -7,6 +7,8 @@ namespace Yef\Storage;
 use DirectoryIterator;
 use InvalidArgumentException;
 use JsonException;
+use Yef\Domain\ContentType\PayloadData;
+use Yef\Domain\Page\ContentVersion;
 use Yef\Domain\Page\PageId;
 use Yef\Domain\Page\PageMetadata;
 
@@ -38,6 +40,28 @@ final readonly class PageScanner
     }
 
     /**
+     * @throws StorageIoFailure
+     * @throws InvalidArgumentException
+     */
+    public function readPayload(string $pageDirectory): PayloadData
+    {
+        $directory = $this->layout->payloadDirectory($pageDirectory);
+        $parts = [];
+        if (!is_dir($directory)) {
+            return new PayloadData($parts);
+        }
+
+        foreach (new DirectoryIterator($directory) as $file) {
+            $part = $file->isFile() ? $this->layout->partNameOf($file->getFilename()) : null;
+            if ($part !== null) {
+                $parts[$part] = $this->files->read($file->getPathname());
+            }
+        }
+
+        return new PayloadData($parts);
+    }
+
+    /**
      * Directories that are not named like a page (leftovers of interrupted writes) are not pages and are ignored.
      */
     public function scan(): PageScan
@@ -45,15 +69,15 @@ final readonly class PageScanner
         $pages = [];
         $damaged = [];
         foreach ($this->pageDirectories() as $id => $directory) {
-            $metadata = $this->tryReadMetadata($directory);
-            if ($metadata instanceof PageMetadata && $metadata->id->value === $id) {
-                $pages[] = $metadata;
+            $page = $this->tryRead($directory);
+            if ($page instanceof IndexedPage && $page->metadata->id->value === $id) {
+                $pages[] = $page;
             } else {
                 $damaged[] = new PageId($id);
             }
         }
 
-        usort($pages, static fn(PageMetadata $first, PageMetadata $second): int => $first->id->value <=> $second->id->value);
+        usort($pages, static fn(IndexedPage $first, IndexedPage $second): int => $first->metadata->id->value <=> $second->metadata->id->value);
         usort($damaged, static fn(PageId $first, PageId $second): int => $first->value <=> $second->value);
 
         return new PageScan($pages, $damaged);
@@ -78,10 +102,12 @@ final readonly class PageScanner
         return $directories;
     }
 
-    private function tryReadMetadata(string $directory): ?PageMetadata
+    private function tryRead(string $directory): ?IndexedPage
     {
         try {
-            return $this->readMetadata($directory);
+            $metadata = $this->readMetadata($directory);
+
+            return new IndexedPage($metadata, ContentVersion::of($metadata, $this->readPayload($directory)));
         } catch (StorageIoFailure|JsonException|InvalidArgumentException) {
             return null;
         }

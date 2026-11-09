@@ -34,6 +34,16 @@ final readonly class StorageLayout
         return $this->stateDirectory . '/pages-index.json';
     }
 
+    public function publishedFile(): string
+    {
+        return $this->stateDirectory . '/published.json';
+    }
+
+    public function publishedLockFile(): string
+    {
+        return $this->stateDirectory . '/published.lock';
+    }
+
     public function pageDirectory(PageId $id): string
     {
         return $this->pagesDirectory . '/' . $id->value;

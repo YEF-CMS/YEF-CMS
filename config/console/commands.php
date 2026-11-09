@@ -9,4 +9,5 @@ return [
     'yef:storage:check' => Console\CheckPageStorageCommand::class,
     'yef:publish' => Console\PublishPageCommand::class,
     'yef:rebuild' => Console\RebuildSiteCommand::class,
+    'yef:apply' => Console\ApplyChangesCommand::class,
 ];
