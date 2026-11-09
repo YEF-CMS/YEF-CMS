@@ -9,7 +9,7 @@ use Yef\Domain\ContentType\ContentTypeId;
 use Yef\Domain\ContentType\ContentTypeRegistry;
 
 /**
- * A minimal content type for tests; it also shows what a module has to provide.
+ * The content type of the text pages module; it also shows what a module has to provide.
  */
 final class TextContentType
 {

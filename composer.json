@@ -20,6 +20,7 @@
         "ext-filter": "*",
         "ext-json": "*",
         "ext-mbstring": "*",
+        "composer/semver": "^3.4",
         "httpsoft/http-message": "^1.1.6",
         "psr/container": "^2.0.2",
         "psr/http-factory": "^1.1",
@@ -54,13 +55,13 @@
     },
     "autoload": {
         "psr-4": {
-            "Yef\\": "src/",
-            "YefCms\\TextPages\\": "modules/yef-cms__text/src/"
+            "Yef\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Yef\\Tests\\": "tests/"
+            "Yef\\Tests\\": "tests/",
+            "YefCms\\TextPages\\": "modules/yef-cms__text/src/"
         }
     },
     "extra": {

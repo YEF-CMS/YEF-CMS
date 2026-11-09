@@ -41,7 +41,7 @@ deptrac:
         - { type: classNameRegex, value: '#^Psr\\#' }
     - name: Framework
       collectors:
-        - { type: classNameRegex, value: '#^(Yiisoft|Twig|Symfony|HttpSoft)\\#' }
+        - { type: classNameRegex, value: '#^(Yiisoft|Twig|Symfony|HttpSoft|Composer)\\#' }
   ruleset:
     Domain:
       - Psr

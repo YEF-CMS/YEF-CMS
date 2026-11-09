@@ -10,4 +10,7 @@ return [
     'yef:publish' => Console\PublishPageCommand::class,
     'yef:rebuild' => Console\RebuildSiteCommand::class,
     'yef:apply' => Console\ApplyChangesCommand::class,
+    'yef:modules' => Console\ListModulesCommand::class,
+    'yef:module:enable' => Console\EnableModuleCommand::class,
+    'yef:module:disable' => Console\DisableModuleCommand::class,
 ];

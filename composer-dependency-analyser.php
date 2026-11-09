@@ -15,7 +15,7 @@ return (new Configuration())
     // PHP extensions needed by dependencies, the `bin/yef` entry point (no .php extension),
     // the Yii config plugin and its DI container, and packages wired in via config.
     ->ignoreErrorsOnExtensions(
-        ['ext-ctype', 'ext-mbstring'],
+        ['ext-ctype'],
         [ErrorType::UNUSED_DEPENDENCY],
     )
     ->ignoreErrorsOnPackages(

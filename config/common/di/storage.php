@@ -8,12 +8,12 @@ use Yef\Domain\Page\PageRepository;
 use Yef\Domain\Page\PageStorageIntegrity;
 use Yef\Domain\Page\PageVersions;
 use Yef\Domain\Publishing\PublishedPages;
+use Yef\Module\ModuleLoader;
 use Yef\Storage\FilePageIntegrity;
 use Yef\Storage\FilePageRepository;
 use Yef\Storage\FilePublishedPages;
 use Yef\Storage\StorageLayout;
 use Yef\Storage\UlidPageIdGenerator;
-use YefCms\TextPages\TextContentType;
 use Yiisoft\Aliases\Aliases;
 
 return [
@@ -21,11 +21,10 @@ return [
         $aliases->get('@content') . '/pages',
         $aliases->get('@runtime') . '/storage',
     ),
-    // Until the module loader exists, the bundled text module is registered by hand;
-    // pages of any other type read as unavailable.
-    ContentTypeRegistry::class => static fn(): ContentTypeRegistry => new ContentTypeRegistry([
-        TextContentType::definition(),
-    ]),
+    // Content types come from the enabled modules; pages of any other type read as unavailable.
+    ContentTypeRegistry::class => static fn(ModuleLoader $modules): ContentTypeRegistry => new ContentTypeRegistry(
+        $modules->contentTypes(),
+    ),
     PageRepository::class => FilePageRepository::class,
     PageVersions::class => FilePageRepository::class,
     PublishedPages::class => FilePublishedPages::class,
