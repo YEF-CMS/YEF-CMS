@@ -1,0 +1,79 @@
+{% extends 'layout.twig' %}
+
+{% macro error(message) %}
+    {% if message %}
+        <div class="invalid-feedback d-block">{% if message.key %}{{ t(message.key, message.params) }}{% else %}{{ message.text }}{% endif %}</div>
+    {% endif %}
+{% endmacro %}
+
+{% block page_title %}{{ pageId ? t('pages.edit') : t('pages.new') }}{% endblock %}
+
+{% block nav_pages %}active{% endblock %}
+
+{% block content %}
+{% import _self as form %}
+<h1 class="h3 mb-1">{{ pageId ? t('pages.edit') : t('pages.new') }}</h1>
+<p class="text-body-secondary mb-4">{{ t('pages.of_type', {type: type.title}) }}</p>
+
+{% if errors.general ?? null %}
+    <div class="alert alert-danger">{{ t(errors.general.key) }}</div>
+{% endif %}
+
+<form method="post" action="{{ pageId ? url('admin.pages.edit', {id: pageId}) : url('admin.pages.new', {}, {type: type.id.value}) }}" class="yef-form" novalidate>
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+    <div class="mb-3">
+        <label for="title" class="form-label">{{ t('pages.field.title') }}</label>
+        <input type="text" class="form-control{{ errors.title ?? null ? ' is-invalid' : '' }}" id="title" name="title" value="{{ values.title }}" required>
+        {{ form.error(errors.title ?? null) }}
+    </div>
+
+    <div class="mb-3">
+        <label for="path" class="form-label">{{ t('pages.field.address') }}</label>
+        <div class="input-group">
+            <span class="input-group-text">/</span>
+            <input type="text" class="form-control font-monospace{{ errors.path ?? null ? ' is-invalid' : '' }}" id="path" name="path" value="{{ values.path }}" aria-describedby="path-help">
+        </div>
+        {{ form.error(errors.path ?? null) }}
+        <div class="form-text" id="path-help">{{ t('pages.field.address_hint') }}</div>
+    </div>
+
+    {% if errors.payload ?? null %}
+        <div class="alert alert-danger">{{ errors.payload.text }}</div>
+    {% endif %}
+
+    {% for field in fields %}
+        <div class="mb-3">
+            <label for="field-{{ field.name }}" class="form-label">{{ field.label }}</label>
+            {% if field.kind.value == 'text' %}
+                <input type="text" class="form-control" id="field-{{ field.name }}" name="fields[{{ field.name }}]" value="{{ values.fields[field.name] }}"{{ field.required ? ' required' : '' }}>
+            {% elseif field.kind.value == 'long_text' %}
+                <textarea class="form-control" id="field-{{ field.name }}" name="fields[{{ field.name }}]" rows="5"{{ field.required ? ' required' : '' }}>{{ values.fields[field.name] }}</textarea>
+            {% else %}
+                <textarea class="form-control font-monospace" id="field-{{ field.name }}" name="fields[{{ field.name }}]" rows="14" data-yef-rich-text{{ field.required ? ' required' : '' }}>{{ values.fields[field.name] }}</textarea>
+            {% endif %}
+        </div>
+    {% endfor %}
+
+    <fieldset class="mb-3">
+        <legend class="h6">{{ t('pages.field.seo') }}</legend>
+        <div class="mb-3">
+            <label for="meta_title" class="form-label">{{ t('pages.field.meta_title') }}</label>
+            <input type="text" class="form-control" id="meta_title" name="meta_title" value="{{ values.metaTitle }}">
+        </div>
+        <div class="mb-3">
+            <label for="meta_description" class="form-label">{{ t('pages.field.meta_description') }}</label>
+            <textarea class="form-control" id="meta_description" name="meta_description" rows="2">{{ values.metaDescription }}</textarea>
+        </div>
+    </fieldset>
+
+    <div class="form-check form-switch mb-4">
+        <input class="form-check-input" type="checkbox" role="switch" id="published" name="published" value="1"{{ values.published ? ' checked' : '' }}>
+        <label class="form-check-label" for="published">{{ t('pages.field.published') }}</label>
+        <div class="form-text">{{ t('pages.field.published_hint') }}</div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">{{ t('common.save') }}</button>
+    <a class="btn btn-outline-secondary" href="{{ url('admin.pages') }}">{{ t('common.cancel') }}</a>
+</form>
+{% endblock %}

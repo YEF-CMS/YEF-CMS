@@ -1,0 +1,13 @@
+{% extends 'layout.twig' %}
+
+{% block page_title %}{{ page.details.title }}{% endblock %}
+
+{% block nav_pages %}active{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-3">{{ page.details.title }}</h1>
+<div class="alert alert-warning">{{ t('pages.unavailable') }}</div>
+<button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#delete-{{ page.id.value }}">{{ t('pages.delete') }}</button>
+<a class="btn btn-outline-secondary" href="{{ url('admin.pages') }}">{{ t('common.back') }}</a>
+{% include 'pages/_delete_modal.twig' %}
+{% endblock %}

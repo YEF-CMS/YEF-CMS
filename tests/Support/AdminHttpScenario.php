@@ -12,12 +12,20 @@ use Psr\Http\Message\ServerRequestInterface;
 use Yef\Admin\Authentication\UserIdentityRepository;
 use Yef\Admin\Http\Redirect;
 use Yef\Admin\View\AdminView;
+use Yef\Application\Page\CreatePage;
+use Yef\Application\Page\DeletePage;
+use Yef\Application\Page\GetPage;
+use Yef\Application\Page\ListContentTypes;
+use Yef\Application\Page\ListPages;
+use Yef\Application\Page\SummarizePages;
+use Yef\Application\Page\UpdatePage;
 use Yef\Application\User\Authenticate;
 use Yef\Application\User\CompleteSetup;
 use Yef\Application\User\CreateUser;
 use Yef\Application\User\FindUser;
 use Yef\Application\User\PasswordPolicy;
 use Yef\Application\User\PrepareSetup;
+use YefCms\TextPages\TextContentType;
 use Yiisoft\Translator\CategorySource;
 use Yiisoft\Translator\Message\Php\MessageSource;
 use Yiisoft\Translator\SimpleMessageFormatter;
@@ -53,11 +61,40 @@ final readonly class AdminHttpScenario
 
     public PasswordPolicy $policy;
 
+    public InMemoryFlash $flash;
+
+    public InMemoryPageRepository $pages;
+
+    public CreatePage $createPage;
+
+    public UpdatePage $updatePage;
+
+    public DeletePage $deletePage;
+
+    public GetPage $getPage;
+
+    public ListPages $listPages;
+
+    public ListContentTypes $listContentTypes;
+
+    public SummarizePages $summarizePages;
+
     private string $cacheDirectory;
 
     public function __construct()
     {
         $root = dirname(__DIR__, 2);
+        $this->flash = new InMemoryFlash();
+        $this->pages = new InMemoryPageRepository();
+        $types = TextContentType::registry();
+        $clock = new FrozenClock();
+        $this->createPage = new CreatePage($this->pages, $types, new SequentialPageIdGenerator(), $clock);
+        $this->updatePage = new UpdatePage($this->pages, $types, $clock);
+        $this->deletePage = new DeletePage($this->pages);
+        $this->getPage = new GetPage($this->pages, $types);
+        $this->listPages = new ListPages($this->pages);
+        $this->listContentTypes = new ListContentTypes($types);
+        $this->summarizePages = new SummarizePages($this->pages);
         $this->users = new InMemoryUserRepository();
         $this->setupToken = new InMemorySetupToken();
         $hasher = new FakePasswordHasher();
@@ -92,6 +129,9 @@ final readonly class AdminHttpScenario
             $translator,
             $this->urls,
             new FakeCsrfToken(),
+            $this->flash,
+            $this->currentUser,
+            $this->findUser,
             $responses,
         );
     }

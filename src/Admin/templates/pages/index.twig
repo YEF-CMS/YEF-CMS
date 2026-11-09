@@ -1,0 +1,77 @@
+{% extends 'layout.twig' %}
+
+{% block page_title %}{{ t('pages.title') }}{% endblock %}
+
+{% block nav_pages %}active{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 m-0">{{ t('pages.title') }}</h1>
+    <a class="btn btn-primary" href="{{ url('admin.pages.new') }}">{{ t('pages.new') }}</a>
+</div>
+
+<div class="alert alert-info">{{ t('pages.apply_hint') }}</div>
+
+{% if pages is empty %}
+    <p class="text-body-secondary">{{ t('pages.empty') }}</p>
+{% else %}
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>{{ t('pages.column.title') }}</th>
+                    <th>{{ t('pages.column.address') }}</th>
+                    <th>{{ t('pages.column.type') }}</th>
+                    <th>{{ t('pages.column.status') }}</th>
+                    <th>{{ t('pages.column.updated') }}</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for page in pages %}
+                {% set typeTitle = typeTitles[page.type.value]|default(null) %}
+                {% set publicUrl = page.details.path.isHome ? '/' : '/' ~ page.details.path.value ~ '/' %}
+                <tr>
+                    <td>
+                        {% if typeTitle %}
+                            <a href="{{ url('admin.pages.edit', {id: page.id.value}) }}">{{ page.details.title }}</a>
+                        {% else %}
+                            {{ page.details.title }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if page.isPublished %}
+                            <a href="{{ publicUrl }}" target="_blank" rel="noopener"><code>{{ publicUrl }}</code></a>
+                        {% else %}
+                            <code>{{ publicUrl }}</code>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if typeTitle %}
+                            {{ typeTitle }}
+                        {% else %}
+                            <span class="badge text-bg-warning">{{ t('pages.type_unavailable') }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if page.isPublished %}
+                            <span class="badge text-bg-success">{{ t('pages.status.published') }}</span>
+                        {% else %}
+                            <span class="badge text-bg-secondary">{{ t('pages.status.draft') }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-nowrap">{{ page.updatedAt|date('Y-m-d H:i') }}</td>
+                    <td class="text-end text-nowrap">
+                        {% if typeTitle %}
+                            <a class="btn btn-sm btn-outline-primary" href="{{ url('admin.pages.edit', {id: page.id.value}) }}">{{ t('pages.edit') }}</a>
+                        {% endif %}
+                        <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#delete-{{ page.id.value }}">{{ t('pages.delete') }}</button>
+                        {% include 'pages/_delete_modal.twig' %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endif %}
+{% endblock %}

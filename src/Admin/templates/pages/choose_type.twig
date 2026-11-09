@@ -1,0 +1,16 @@
+{% extends 'layout.twig' %}
+
+{% block page_title %}{{ t('pages.new') }}{% endblock %}
+
+{% block nav_pages %}active{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-3">{{ t('pages.new') }}</h1>
+<p>{{ t('pages.choose_type') }}</p>
+<div class="list-group mb-3">
+    {% for type in types %}
+        <a class="list-group-item list-group-item-action" href="{{ url('admin.pages.new', {}, {type: type.id.value}) }}">{{ type.title }}</a>
+    {% endfor %}
+</div>
+<a class="btn btn-outline-secondary" href="{{ url('admin.pages') }}">{{ t('common.back') }}</a>
+{% endblock %}

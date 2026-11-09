@@ -7,5 +7,31 @@
 {% block content %}
 <h1 class="h3 mb-3">{{ t('dashboard.title') }}</h1>
 <p class="lead">{{ t('dashboard.welcome', {login: login}) }}</p>
-<p class="text-body-secondary">{{ t('dashboard.intro') }}</p>
+
+<div class="row g-3 mb-4">
+    <div class="col-sm-4">
+        <a class="card text-decoration-none h-100" href="{{ url('admin.pages') }}">
+            <div class="card-body">
+                <div class="display-6">{{ summary.total }}</div>
+                <div class="text-body-secondary">{{ t('dashboard.pages_total') }}</div>
+            </div>
+        </a>
+    </div>
+    <div class="col-sm-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="display-6">{{ summary.published }}</div>
+                <div class="text-body-secondary">{{ t('dashboard.pages_published') }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="display-6">{{ summary.drafts }}</div>
+                <div class="text-body-secondary">{{ t('dashboard.pages_drafts') }}</div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

@@ -1,0 +1,19 @@
+<div class="modal fade" id="delete-{{ page.id.value }}" tabindex="-1" aria-labelledby="delete-title-{{ page.id.value }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <form class="modal-content" method="post" action="{{ url('admin.pages.delete', {id: page.id.value}) }}">
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+            <div class="modal-header">
+                <h2 class="modal-title h5" id="delete-title-{{ page.id.value }}">{{ t('pages.delete_title') }}</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ t('common.cancel') }}"></button>
+            </div>
+            <div class="modal-body">
+                <p>{{ t('pages.delete_question', {title: page.details.title}) }}</p>
+                <p class="text-body-secondary mb-0">{{ t('pages.delete_note') }}</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ t('common.cancel') }}</button>
+                <button type="submit" class="btn btn-danger">{{ t('pages.delete_confirm') }}</button>
+            </div>
+        </form>
+    </div>
+</div>

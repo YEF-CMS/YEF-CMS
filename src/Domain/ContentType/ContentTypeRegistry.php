@@ -7,6 +7,7 @@ namespace Yef\Domain\ContentType;
 use InvalidArgumentException;
 use Yef\Domain\ContentType\Exception\UnknownContentType;
 
+use function array_values;
 use function sprintf;
 
 final readonly class ContentTypeRegistry
@@ -33,6 +34,14 @@ final readonly class ContentTypeRegistry
         }
 
         $this->definitions = $indexed;
+    }
+
+    /**
+     * @return list<ContentTypeDefinition> In the order the types were registered.
+     */
+    public function all(): array
+    {
+        return array_values($this->definitions);
     }
 
     public function has(ContentTypeId $id): bool

@@ -19,6 +19,8 @@ final class TextContentType
     {
         return new ContentTypeDefinition(
             new ContentTypeId(self::ID),
+            'Text page',
+            new TextPageForm(),
             new TextPayloadFactory(),
             new TextPayloadSerializer(),
             new TextContentRenderer(),

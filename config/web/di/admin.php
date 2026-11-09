@@ -8,6 +8,7 @@ use Yef\Admin\Authentication\UserIdentityRepository;
 use Yef\Admin\Http\CsrfFailureHandler;
 use Yef\Admin\Http\StripScriptName;
 use Yef\Admin\View\AdminView;
+use Yef\Application\User\FindUser;
 use Yiisoft\Aliases\Aliases;
 use Yiisoft\Auth\IdentityRepositoryInterface;
 use Yiisoft\Auth\Middleware\Authentication;
@@ -16,6 +17,7 @@ use Yiisoft\Csrf\CsrfTokenInterface;
 use Yiisoft\Csrf\CsrfTokenMiddleware;
 use Yiisoft\Definitions\Reference;
 use Yiisoft\Router\UrlGeneratorInterface;
+use Yiisoft\Session\Flash\FlashInterface;
 use Yiisoft\Session\Session;
 use Yiisoft\Session\SessionInterface;
 use Yiisoft\Translator\TranslatorInterface;
@@ -79,6 +81,9 @@ return [
         TranslatorInterface $translator,
         UrlGeneratorInterface $urlGenerator,
         CsrfTokenInterface $csrfToken,
+        FlashInterface $flash,
+        CurrentUser $currentUser,
+        FindUser $findUser,
         ResponseFactoryInterface $responseFactory,
     ): AdminView => new AdminView(
         $aliases->get('@src/Admin/templates'),
@@ -86,6 +91,9 @@ return [
         $translator,
         $urlGenerator,
         $csrfToken,
+        $flash,
+        $currentUser,
+        $findUser,
         $responseFactory,
     ),
 ];

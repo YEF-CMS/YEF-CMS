@@ -196,7 +196,7 @@ final class AdminPagesTest extends TestCase
     {
         $this->admin->signIn('editor');
 
-        $response = new Dashboard\Action($this->admin->currentUser, $this->admin->findUser, $this->admin->view)($this->admin->request());
+        $response = new Dashboard\Action($this->admin->summarizePages, $this->admin->view)($this->admin->request());
         $html = (string) $response->getBody();
 
         $this->assertSame(200, $response->getStatusCode());

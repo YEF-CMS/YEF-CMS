@@ -16,5 +16,6 @@ final readonly class CreatePageCommand
         public array $input,
         public string $metaTitle = '',
         public string $metaDescription = '',
+        public bool $published = false,
     ) {}
 }

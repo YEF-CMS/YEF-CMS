@@ -12,9 +12,13 @@ use Twig\Error\Error as TwigError;
 use Twig\Loader\FilesystemLoader;
 use Twig\TwigFunction;
 use Yef\Admin\Http\StripScriptName;
+use Yef\Application\User\FindUser;
+use Yef\Domain\User\User;
 use Yiisoft\Csrf\CsrfTokenInterface;
 use Yiisoft\Router\UrlGeneratorInterface;
+use Yiisoft\Session\Flash\FlashInterface;
 use Yiisoft\Translator\TranslatorInterface;
+use Yiisoft\User\CurrentUser;
 
 use function is_string;
 
@@ -39,6 +43,9 @@ final readonly class AdminView
         TranslatorInterface $translator,
         UrlGeneratorInterface $urlGenerator,
         private CsrfTokenInterface $csrfToken,
+        private FlashInterface $flash,
+        private CurrentUser $currentUser,
+        private FindUser $findUser,
         private ResponseFactoryInterface $responseFactory,
     ) {
         $this->twig = new Environment(new FilesystemLoader($templatesDirectory), [
@@ -64,6 +71,8 @@ final readonly class AdminView
         $variables += [
             'csrfToken' => $this->csrfToken->getValue(),
             'assetsUrl' => $this->directoryOf($request) . '/assets',
+            'flash' => $this->flashMessages(),
+            'login' => $this->signedInLogin(),
         ];
 
         $response = $this->responseFactory
@@ -72,6 +81,39 @@ final readonly class AdminView
         $response->getBody()->write($this->twig->render($template . '.twig', $variables));
 
         return $response;
+    }
+
+    /**
+     * @return string The login of the signed-in user, empty for a guest.
+     */
+    private function signedInLogin(): string
+    {
+        if ($this->currentUser->isGuest()) {
+            return '';
+        }
+
+        $user = $this->findUser->handle($this->currentUser->getId() ?? '');
+
+        return $user instanceof User ? $user->login->value : '';
+    }
+
+    /**
+     * The one-time messages waiting for this visitor, by kind ("success", "danger"), each a translation key.
+     *
+     * @return array<string, string>
+     */
+    private function flashMessages(): array
+    {
+        $messages = [];
+        foreach (['success', 'danger'] as $kind) {
+            /** @psalm-suppress MixedAssignment The type is checked right below. */
+            $message = $this->flash->get($kind);
+            if (is_string($message)) {
+                $messages[$kind] = $message;
+            }
+        }
+
+        return $messages;
     }
 
     private function directoryOf(ServerRequestInterface $request): string

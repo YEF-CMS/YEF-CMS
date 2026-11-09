@@ -50,10 +50,13 @@ final readonly class CreatePage
             throw PathAlreadyTaken::byPath($details->path);
         }
 
+        $now = $this->clock->now();
         $page = new Page(
-            PageMetadata::draft($this->ids->next(), $type, $details, $this->clock->now()),
+            PageMetadata::draft($this->ids->next(), $type, $details, $now),
             $definition->factory->fromInput($command->input),
         );
+        $page = $command->published ? $page->publish($now) : $page;
+
         $this->pages->save($page);
 
         return $page;

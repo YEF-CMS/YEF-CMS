@@ -25,5 +25,13 @@ return [
         ->routes(
             Route::get('/')->action(Admin\Dashboard\Action::class)->name('admin.dashboard'),
             Route::post('/logout')->action(Admin\Logout\Action::class)->name('admin.logout'),
+            Route::get('/pages')->action(Admin\Pages\ListAction::class)->name('admin.pages'),
+            Route::methods(['GET', 'POST'], '/pages/new')
+                ->action(Admin\Pages\NewAction::class)
+                ->name('admin.pages.new'),
+            Route::methods(['GET', 'POST'], '/pages/{id}/edit')
+                ->action(Admin\Pages\EditAction::class)
+                ->name('admin.pages.edit'),
+            Route::post('/pages/{id}/delete')->action(Admin\Pages\DeleteAction::class)->name('admin.pages.delete'),
         ),
 ];

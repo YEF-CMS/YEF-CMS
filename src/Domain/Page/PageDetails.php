@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yef\Domain\Page;
 
-use InvalidArgumentException;
+use Yef\Domain\Page\Exception\InvalidPageDetails;
 
 use function trim;
 
@@ -20,7 +20,7 @@ final readonly class PageDetails
         public string $metaDescription = '',
     ) {
         if (trim($title) === '') {
-            throw new InvalidArgumentException('Page title must not be empty.');
+            throw InvalidPageDetails::titleIsEmpty();
         }
     }
 }

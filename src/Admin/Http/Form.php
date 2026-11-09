@@ -26,6 +26,17 @@ final readonly class Form
         return new self(is_array($body) ? $body : []);
     }
 
+    /**
+     * The fields grouped under a name (`fields[body]` is the field "body" of the section "fields").
+     */
+    public function section(string $name): self
+    {
+        /** @psalm-suppress MixedAssignment The type is checked right below. */
+        $section = $this->fields[$name] ?? null;
+
+        return new self(is_array($section) ? $section : []);
+    }
+
     public function text(string $field): string
     {
         /** @psalm-suppress MixedAssignment The type is checked right below. */
