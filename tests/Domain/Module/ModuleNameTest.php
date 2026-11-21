@@ -23,6 +23,18 @@ final class ModuleNameTest extends TestCase
         $this->assertSame('yef-cms/gallery', (string) $name);
     }
 
+    public function testDirectoryNameLeadsBackToTheName(): void
+    {
+        $this->assertTrue(ModuleName::fromDirectoryName('yef-cms__gallery')->equals(new ModuleName('yef-cms/gallery')));
+    }
+
+    public function testDirectoryNameWithoutVendorIsRejected(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        ModuleName::fromDirectoryName('gallery');
+    }
+
     public function testNamesAreComparedByValue(): void
     {
         $this->assertTrue(new ModuleName('acme/news')->equals(new ModuleName('acme/news')));

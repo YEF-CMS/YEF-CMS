@@ -1,0 +1,19 @@
+<div class="modal fade" id="disable-{{ module.slug }}" tabindex="-1" aria-labelledby="disable-title-{{ module.slug }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <form class="modal-content" method="post" action="{{ url('admin.modules.disable', {name: module.slug}) }}">
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+            <div class="modal-header">
+                <h2 class="modal-title h5" id="disable-title-{{ module.slug }}">{{ t('modules.disable_title') }}</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ t('common.cancel') }}"></button>
+            </div>
+            <div class="modal-body">
+                <p>{{ t('modules.disable_question', {title: module.status.title}) }}</p>
+                <p class="text-body-secondary mb-0">{{ t('modules.disable_note') }}</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ t('common.cancel') }}</button>
+                <button type="submit" class="btn btn-danger">{{ t('modules.disable_confirm') }}</button>
+            </div>
+        </form>
+    </div>
+</div>

@@ -41,6 +41,17 @@ final readonly class ModuleName implements Stringable
     }
 
     /**
+     * The name that belongs to a directory of `modules/` ("yef-cms__gallery" is "yef-cms/gallery").
+     * Names have no underscores, so the way back is unambiguous.
+     *
+     * @throws InvalidArgumentException When the directory name does not stand for a "vendor/name".
+     */
+    public static function fromDirectoryName(string $directoryName): self
+    {
+        return new self(str_replace('__', '/', $directoryName));
+    }
+
+    /**
      * Name of the directory in `modules/` ("yef-cms__gallery").
      */
     public function directoryName(): string

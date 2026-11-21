@@ -38,7 +38,7 @@ deptrac:
     # Installable modules: they may only use the public content type contract.
     - name: Modules
       collectors:
-        - { type: directory, value: modules/.* }
+        - { type: directory, value: (?-i)modules/.* }
     # Vendor code
     - name: Psr
       collectors:

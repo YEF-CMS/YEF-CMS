@@ -1,0 +1,64 @@
+{% extends 'layout.twig' %}
+
+{% block page_title %}{{ t('modules.title') }}{% endblock %}
+
+{% block nav_modules %}active{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-3">{{ t('modules.title') }}</h1>
+
+{% if modules is empty %}
+    <p class="text-body-secondary">{{ t('modules.empty') }}</p>
+{% else %}
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>{{ t('modules.column.title') }}</th>
+                    <th>{{ t('modules.column.id') }}</th>
+                    <th>{{ t('modules.column.version') }}</th>
+                    <th>{{ t('modules.column.state') }}</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for module in modules %}
+                {% set state = module.status.state.value %}
+                <tr>
+                    <td>
+                        {{ module.status.title }}
+                        {% if state == 'failed' %}
+                            <div class="small text-danger">{{ module.status.reason }}</div>
+                        {% endif %}
+                    </td>
+                    <td><code>{{ module.status.id }}</code></td>
+                    <td>{{ module.status.version }}</td>
+                    <td>
+                        {% if state == 'loaded' %}
+                            <span class="badge text-bg-success">{{ t('modules.state.loaded') }}</span>
+                        {% elseif state == 'disabled' %}
+                            <span class="badge text-bg-secondary">{{ t('modules.state.disabled') }}</span>
+                        {% else %}
+                            <span class="badge text-bg-danger">{{ t('modules.state.failed') }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end text-nowrap">
+                        {% if module.slug is not null %}
+                            {% if state == 'disabled' %}
+                                <form method="post" action="{{ url('admin.modules.enable', {name: module.slug}) }}" class="d-inline">
+                                    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-success">{{ t('modules.enable') }}</button>
+                                </form>
+                            {% else %}
+                                <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#disable-{{ module.slug }}">{{ t('modules.disable') }}</button>
+                                {% include 'modules/_disable_modal.twig' %}
+                            {% endif %}
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endif %}
+{% endblock %}

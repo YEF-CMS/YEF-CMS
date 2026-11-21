@@ -33,6 +33,9 @@ return [
                 ->action(Admin\Pages\EditAction::class)
                 ->name('admin.pages.edit'),
             Route::post('/pages/{id}/delete')->action(Admin\Pages\DeleteAction::class)->name('admin.pages.delete'),
+            Route::get('/modules')->action(Admin\Modules\ListAction::class)->name('admin.modules'),
+            Route::post('/modules/{name}/enable')->action(Admin\Modules\EnableAction::class)->name('admin.modules.enable'),
+            Route::post('/modules/{name}/disable')->action(Admin\Modules\DisableAction::class)->name('admin.modules.disable'),
             Route::get('/apply')->action(Admin\Apply\ScreenAction::class)->name('admin.apply'),
             Route::post('/apply/step')->action(Admin\Apply\StepAction::class)->name('admin.apply.step'),
         ),

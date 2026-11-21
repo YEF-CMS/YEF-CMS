@@ -25,6 +25,9 @@
                 <a class="nav-link {% block nav_pages %}{% endblock %}" href="{{ url('admin.pages') }}">{{ t('nav.pages') }}</a>
             </li>
             <li class="nav-item">
+                <a class="nav-link {% block nav_modules %}{% endblock %}" href="{{ url('admin.modules') }}">{{ t('nav.modules') }}</a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link {% block nav_apply %}{% endblock %}" href="{{ url('admin.apply') }}">{{ t('nav.apply') }}</a>
             </li>
         </ul>
