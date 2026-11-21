@@ -15,6 +15,7 @@ use Yef\Domain\ContentType\Exception\UnknownContentType;
 use Yef\Tests\Support\FakePageRenderer;
 use Yef\Tests\Support\FrozenClock;
 use Yef\Tests\Support\SequentialPageIdGenerator;
+use Yef\Tests\Support\TestTexts;
 use YefCms\TextPages\TextContentType;
 
 #[CoversClass(PreviewPage::class)]
@@ -59,7 +60,7 @@ final class PreviewPageTest extends TestCase
 
     private function preview(): PreviewPage
     {
-        $types = TextContentType::registry();
+        $types = TextContentType::registry(TestTexts::textModule());
 
         return new PreviewPage($types, new SequentialPageIdGenerator(), new FrozenClock(), new RenderPage($types, new FakePageRenderer()));
     }

@@ -110,6 +110,12 @@ return [
     'modules.disable_confirm' => 'Modul deaktivieren',
     'modules.error.cannot_enable' => 'Das Modul kann nicht aktiviert werden: Den Grund sehen Sie in der Liste.',
     'modules.error.settings' => 'Die Liste der aktivierten Module konnte nicht gespeichert werden.',
+    'modules.reason.incompatible' => 'Benötigt Yef {needs}, installiert ist aber {current}.',
+    'modules.reason.not_installed' => 'Aktiviert, aber nicht installiert.',
+    'modules.reason.class_missing' => 'Die Klasse {class} wurde nicht gefunden.',
+    'modules.reason.not_a_module' => 'Die Klasse {class} implementiert ModuleInterface nicht.',
+    'modules.reason.registration_failed' => 'Registrierung fehlgeschlagen: {reason}',
+    'modules.reason.type_taken' => 'Der Inhaltstyp „{type}“ wird bereits vom Modul „{module}“ bereitgestellt.',
 
     'apply.title' => 'Änderungen übernehmen',
     'apply.intro' => 'Gespeicherte Seiten erreichen die öffentliche Website erst, wenn die Änderungen übernommen werden. Nur die geänderten Seiten werden neu erzeugt; gelöschte Seiten und Seiten, die zu Entwürfen wurden, werden entfernt.',

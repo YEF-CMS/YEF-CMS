@@ -51,11 +51,11 @@ final readonly class PublishingScenario
             $this->pages,
             $this->published,
             $html,
-            new RenderPage(TextContentType::registry(), new FakePageRenderer()),
+            new RenderPage(TextContentType::registry(TestTexts::textModule()), new FakePageRenderer()),
             $this->publisher,
         );
         $this->unpublishPage = new UnpublishPage($this->published, $html);
-        $this->planChanges = new PlanChanges($this->pages, $this->pages, $this->published, TextContentType::registry());
+        $this->planChanges = new PlanChanges($this->pages, $this->pages, $this->published, TextContentType::registry(TestTexts::textModule()));
         $applyChange = new ApplyChange($this->publishPage, $this->unpublishPage);
         $this->applyChanges = new ApplyChanges($this->planChanges, $applyChange);
         $this->applyPageChange = new ApplyPageChange($this->planChanges, $applyChange);

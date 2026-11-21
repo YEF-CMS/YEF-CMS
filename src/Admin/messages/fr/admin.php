@@ -110,6 +110,12 @@ return [
     'modules.disable_confirm' => 'Désactiver le module',
     'modules.error.cannot_enable' => 'Le module ne peut pas être activé : voyez la raison dans la liste.',
     'modules.error.settings' => 'La liste des modules activés n’a pas pu être enregistrée.',
+    'modules.reason.incompatible' => 'Nécessite Yef {needs}, mais la version installée est {current}.',
+    'modules.reason.not_installed' => 'Activé, mais non installé.',
+    'modules.reason.class_missing' => 'La classe {class} est introuvable.',
+    'modules.reason.not_a_module' => 'La classe {class} n’implémente pas ModuleInterface.',
+    'modules.reason.registration_failed' => 'L’enregistrement a échoué : {reason}',
+    'modules.reason.type_taken' => 'Le type de contenu « {type} » est déjà fourni par le module « {module} ».',
 
     'apply.title' => 'Appliquer les modifications',
     'apply.intro' => 'Les pages enregistrées n’arrivent sur le site public qu’une fois les modifications appliquées. Seules les pages modifiées sont régénérées, et les pages supprimées ou repassées en brouillon sont retirées.',

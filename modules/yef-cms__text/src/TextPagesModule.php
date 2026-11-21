@@ -18,6 +18,6 @@ final class TextPagesModule implements ModuleInterface
     #[Override]
     public function register(ModuleContext $context): void
     {
-        $context->addContentType(TextContentType::definition());
+        $context->addContentType(TextContentType::definition($context->texts()));
     }
 }

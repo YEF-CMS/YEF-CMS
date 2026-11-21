@@ -14,6 +14,7 @@ use Yef\Storage\PageMetadataRecord;
 use Yef\Storage\StorageIoFailure;
 use Yef\Storage\StorageLayout;
 use Yef\Tests\Support\TemporaryDirectory;
+use Yef\Tests\Support\TestTexts;
 use YefCms\TextPages\TextContentType;
 
 #[CoversClass(FilePageRepository::class)]
@@ -43,7 +44,7 @@ final class FilePageRepositoryTest extends PageRepositoryContract
     {
         return new FilePageRepository(
             new StorageLayout($this->directory->path . '/content/pages', $this->directory->path . '/var/storage'),
-            TextContentType::registry(),
+            TextContentType::registry(TestTexts::textModule()),
         );
     }
 }

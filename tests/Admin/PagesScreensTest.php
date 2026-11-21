@@ -38,6 +38,7 @@ use Yef\Domain\Page\PageMetadata;
 use Yef\Domain\Page\PagePath;
 use Yef\Tests\Support\AdminHttpScenario;
 use Yef\Tests\Support\FakeCsrfToken;
+use Yef\Tests\Support\TestTexts;
 use YefCms\TextPages\TextContentRenderer;
 use YefCms\TextPages\TextContentType;
 use YefCms\TextPages\TextPageForm;
@@ -361,7 +362,7 @@ final class PagesScreensTest extends TestCase
 
     public function testSubmittedFormReadsOnlyTheFieldsOfItsType(): void
     {
-        $type = TextContentType::definition();
+        $type = TextContentType::definition(TestTexts::textModule());
         $request = $this->admin->request('POST', '/pages/new', [
             'title' => ' T ',
             'path' => ' /a/b/ ',
@@ -463,13 +464,13 @@ final class PagesScreensTest extends TestCase
     private function twoTypes(): ContentTypeRegistry
     {
         return new ContentTypeRegistry([
-            TextContentType::definition(),
+            TextContentType::definition(TestTexts::textModule()),
             new ContentTypeDefinition(
                 new ContentTypeId('news'),
                 'News item',
-                new TextPageForm(),
-                new TextPayloadFactory(),
-                new TextPayloadSerializer(),
+                new TextPageForm(TestTexts::textModule()),
+                new TextPayloadFactory(TestTexts::textModule()),
+                new TextPayloadSerializer(TestTexts::textModule()),
                 new TextContentRenderer(),
             ),
         ]);

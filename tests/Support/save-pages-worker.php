@@ -16,6 +16,7 @@ use Yef\Domain\Page\PagePath;
 use Yef\Storage\FilePageRepository;
 use Yef\Storage\StorageLayout;
 use Yef\Storage\UlidPageIdGenerator;
+use Yef\Tests\Support\TestTexts;
 use YefCms\TextPages\TextContentType;
 use YefCms\TextPages\TextPayload;
 
@@ -27,7 +28,7 @@ $stateDirectory = $argv[2] ?? throw new InvalidArgumentException('State director
 $worker = $argv[3] ?? throw new InvalidArgumentException('Worker number is missing.');
 $count = $argv[4] ?? throw new InvalidArgumentException('Page count is missing.');
 
-$repository = new FilePageRepository(new StorageLayout($pagesDirectory, $stateDirectory), TextContentType::registry());
+$repository = new FilePageRepository(new StorageLayout($pagesDirectory, $stateDirectory), TextContentType::registry(TestTexts::textModule()));
 $ids = new UlidPageIdGenerator();
 $now = new DateTimeImmutable('2026-11-08 12:00:00 UTC');
 

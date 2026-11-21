@@ -15,6 +15,7 @@ use Yef\Storage\PageScan;
 use Yef\Storage\PageScanner;
 use Yef\Storage\StorageLayout;
 use Yef\Tests\Support\TemporaryDirectory;
+use Yef\Tests\Support\TestTexts;
 use Yef\Tests\Support\TextPages;
 use YefCms\TextPages\TextContentType;
 
@@ -162,7 +163,7 @@ final class FilePageIntegrityTest extends TestCase
 
     private function repository(): FilePageRepository
     {
-        return new FilePageRepository($this->layout, TextContentType::registry());
+        return new FilePageRepository($this->layout, TextContentType::registry(TestTexts::textModule()));
     }
 
     private function integrity(): FilePageIntegrity

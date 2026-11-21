@@ -110,6 +110,12 @@ return [
     'modules.disable_confirm' => 'Disattiva modulo',
     'modules.error.cannot_enable' => 'Il modulo non può essere attivato: vedi il motivo nell’elenco.',
     'modules.error.settings' => 'Non è stato possibile salvare l’elenco dei moduli attivi.',
+    'modules.reason.incompatible' => 'Richiede Yef {needs}, ma la versione installata è {current}.',
+    'modules.reason.not_installed' => 'Attivo, ma non installato.',
+    'modules.reason.class_missing' => 'La classe {class} non è stata trovata.',
+    'modules.reason.not_a_module' => 'La classe {class} non implementa ModuleInterface.',
+    'modules.reason.registration_failed' => 'Registrazione non riuscita: {reason}',
+    'modules.reason.type_taken' => 'Il tipo di contenuto «{type}» è già fornito dal modulo «{module}».',
 
     'apply.title' => 'Applica le modifiche',
     'apply.intro' => 'Le pagine salvate arrivano sul sito pubblico solo dopo l’applicazione delle modifiche. Vengono rigenerate soltanto le pagine modificate, mentre quelle eliminate o tornate bozza vengono rimosse.',

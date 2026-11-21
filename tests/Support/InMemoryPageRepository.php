@@ -27,7 +27,7 @@ final class InMemoryPageRepository implements PageRepository, PageVersions
 
     public function __construct(?ContentTypeRegistry $types = null)
     {
-        $this->types = $types ?? TextContentType::registry();
+        $this->types = $types ?? TextContentType::registry(TestTexts::textModule());
     }
 
     #[Override]

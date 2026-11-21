@@ -8,6 +8,7 @@ use InvalidArgumentException;
 use Override;
 use Yef\Domain\ContentType\ContentTypeDefinition;
 use Yef\Domain\Module\ModuleContext;
+use Yef\Domain\Text\Texts;
 
 use function array_values;
 use function sprintf;
@@ -19,6 +20,14 @@ final class CollectingModuleContext implements ModuleContext
 {
     /** @var array<string, ContentTypeDefinition> */
     private array $contentTypes = [];
+
+    public function __construct(private readonly Texts $texts) {}
+
+    #[Override]
+    public function texts(): Texts
+    {
+        return $this->texts;
+    }
 
     #[Override]
     public function addContentType(ContentTypeDefinition $definition): void

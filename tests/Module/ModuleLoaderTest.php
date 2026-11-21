@@ -21,6 +21,7 @@ use Yef\Tests\Support\InMemoryEnabledModules;
 use Yef\Tests\Support\ModuleFixtures;
 use Yef\Tests\Support\RecordingLogger;
 use Yef\Tests\Support\TemporaryDirectory;
+use Yef\Tests\Support\TestTexts;
 
 #[CoversClass(ModuleLoader::class)]
 #[CoversClass(ModuleAutoloader::class)]
@@ -99,6 +100,8 @@ final class ModuleLoaderTest extends TestCase
             new ManifestReader(),
             new ModuleAutoloader(),
             $this->logger,
+            TestTexts::core(),
+            TestTexts::modules($this->directory->path . '/nowhere'),
         );
 
         $this->assertSame([], $loader->statuses());
@@ -244,11 +247,73 @@ final class Module {}
             new ManifestReader(),
             new ModuleAutoloader(),
             $this->logger,
+            TestTexts::core(),
+            TestTexts::modules(dirname(__DIR__, 2) . '/modules'),
         );
 
         $this->assertSame(['text'], $this->typeIds($loader));
         $this->assertSame('Text pages', $this->statusAt($loader, 0)->title);
         $this->assertSame([], $this->logger->messages);
+    }
+
+    public function testTitleOfAModuleThatIsNotRunningComesInTheLanguageOfTheSite(): void
+    {
+        $directory = $this->fixtures->install('acme/gallery', ModuleFixtures::addsContentType('gallery'));
+        $this->writeMessages($directory, 'ru', ['module.title' => 'Галерея']);
+
+        $loader = $this->loaderIn('ru', []);
+
+        $this->assertSame(ModuleState::Disabled, $this->statusAt($loader, 0)->state);
+        $this->assertSame('Галерея', $this->statusAt($loader, 0)->title);
+    }
+
+    public function testTitleOfTheManifestIsUsedWhenTheModuleHasNoTitleText(): void
+    {
+        $this->fixtures->install('acme/gallery', ModuleFixtures::addsContentType('gallery'));
+
+        $this->assertSame('Fixture acme/gallery', $this->statusAt($this->loaderIn('ru', []), 0)->title);
+    }
+
+    public function testModuleReadsItsOwnTextsWhileItRegisters(): void
+    {
+        $directory = $this->fixtures->install('acme/gallery', ModuleFixtures::addsContentType('gallery'));
+        $this->writeMessages($directory, 'ru', ['type.title' => 'Галерея']);
+        $this->writeMessages($directory, 'en', ['type.title' => 'Gallery']);
+
+        $russian = $this->loaderIn('ru', ['acme/gallery'])->contentTypes();
+        $german = $this->loaderIn('de', ['acme/gallery'])->contentTypes();
+
+        $this->assertSame('Галерея', $russian[0]->title ?? null);
+        $this->assertSame('Gallery', $german[0]->title ?? null);
+    }
+
+    public function testReasonOfAFailureComesInTheLanguageOfTheSite(): void
+    {
+        $this->fixtures->install('acme/future', ModuleFixtures::addsContentType('future'), ['requires' => ['yef' => '^9.0']]);
+
+        $this->assertStringContainsString('Нужен Yef ^9.0', $this->statusAt($this->loaderIn('ru', ['acme/future']), 0)->reason);
+        $this->assertStringContainsString('Needs Yef ^9.0', $this->statusAt($this->loaderIn('en', ['acme/future']), 0)->reason);
+    }
+
+    public function testReasonOfAMissingModuleComesInTheLanguageOfTheSite(): void
+    {
+        $this->assertSame('Включён, но не установлен.', $this->statusAt($this->loaderIn('ru', ['acme/missing']), 0)->reason);
+    }
+
+    public function testReasonOfAFailedRegistrationNamesWhatWentWrong(): void
+    {
+        $this->fixtures->install('acme/broken', 'throw new \RuntimeException("boom");');
+
+        $this->assertSame('Не удалось зарегистрировать модуль: boom', $this->statusAt($this->loaderIn('ru', ['acme/broken']), 0)->reason);
+    }
+
+    public function testTheLogKeepsTheTechnicalFormOfTheReason(): void
+    {
+        $this->fixtures->install('acme/future', ModuleFixtures::addsContentType('future'), ['requires' => ['yef' => '^9.0']]);
+
+        $this->loaderIn('ru', ['acme/future'])->statuses();
+
+        $this->assertStringContainsString('modules.reason.incompatible', implode(' | ', $this->logger->messages));
     }
 
     private function statusAt(ModuleLoader $loader, int $index): ModuleStatus
@@ -267,7 +332,35 @@ final class Module {}
             new ManifestReader(),
             new ModuleAutoloader(),
             $this->logger,
+            TestTexts::core(),
+            TestTexts::modules($this->directory->path),
         );
+    }
+
+    /**
+     * @param list<string> $enabled
+     */
+    private function loaderIn(string $language, array $enabled): ModuleLoader
+    {
+        return new ModuleLoader(
+            $this->directory->path,
+            new InMemoryEnabledModules($enabled),
+            new ManifestReader(),
+            new ModuleAutoloader(),
+            $this->logger,
+            TestTexts::core($language),
+            TestTexts::modules($this->directory->path, $language),
+        );
+    }
+
+    /**
+     * @param array<string, string> $messages
+     */
+    private function writeMessages(string $moduleDirectory, string $language, array $messages): void
+    {
+        $folder = $moduleDirectory . '/messages/' . $language;
+        mkdir($folder, 0o777, true);
+        file_put_contents($folder . '/' . basename($moduleDirectory) . '.php', '<?php return ' . var_export($messages, true) . ';');
     }
 
     /**

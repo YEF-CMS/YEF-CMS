@@ -110,6 +110,12 @@ return [
     'modules.disable_confirm' => 'Выключить модуль',
     'modules.error.cannot_enable' => 'Модуль нельзя включить: причина указана в списке.',
     'modules.error.settings' => 'Не удалось сохранить список включённых модулей.',
+    'modules.reason.incompatible' => 'Нужен Yef {needs}, а установлен {current}.',
+    'modules.reason.not_installed' => 'Включён, но не установлен.',
+    'modules.reason.class_missing' => 'Класс {class} не найден.',
+    'modules.reason.not_a_module' => 'Класс {class} не реализует ModuleInterface.',
+    'modules.reason.registration_failed' => 'Не удалось зарегистрировать модуль: {reason}',
+    'modules.reason.type_taken' => 'Тип содержимого «{type}» уже предоставляет модуль «{module}».',
 
     'apply.title' => 'Применить изменения',
     'apply.intro' => 'Сохранённые страницы попадают на публичный сайт только после применения изменений. Заново собираются только изменённые страницы, а удалённые и переведённые в черновики снимаются с сайта.',

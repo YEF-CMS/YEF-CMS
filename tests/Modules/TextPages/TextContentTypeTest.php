@@ -10,6 +10,7 @@ use PHPUnit\Framework\TestCase;
 use Yef\Domain\ContentType\Exception\InvalidPayload;
 use Yef\Domain\ContentType\Payload;
 use Yef\Domain\ContentType\PayloadData;
+use Yef\Tests\Support\TestTexts;
 use YefCms\TextPages\TextContentRenderer;
 use YefCms\TextPages\TextContentType;
 use YefCms\TextPages\TextPayload;
@@ -28,7 +29,7 @@ final class TextContentTypeTest extends TestCase
 {
     public function testFactoryBuildsPayloadFromInput(): void
     {
-        $payload = TextContentType::definition()->factory->fromInput(['body' => '<p>Hi</p>']);
+        $payload = TextContentType::definition(TestTexts::textModule())->factory->fromInput(['body' => '<p>Hi</p>']);
 
         $this->assertEquals(new TextPayload('<p>Hi</p>'), $payload);
     }
@@ -37,12 +38,12 @@ final class TextContentTypeTest extends TestCase
     {
         $this->expectException(InvalidPayload::class);
 
-        TextContentType::definition()->factory->fromInput(['body' => ['not', 'a', 'string']]);
+        TextContentType::definition(TestTexts::textModule())->factory->fromInput(['body' => ['not', 'a', 'string']]);
     }
 
     public function testSerializerRoundTripKeepsPayloadIntact(): void
     {
-        $serializer = TextContentType::definition()->serializer;
+        $serializer = TextContentType::definition(TestTexts::textModule())->serializer;
         $payload = new TextPayload('<p>Привет, "мир"</p>' . "\n");
 
         $restored = $serializer->fromData($serializer->toData($payload));
@@ -54,12 +55,12 @@ final class TextContentTypeTest extends TestCase
     {
         $this->expectException(InvalidPayload::class);
 
-        TextContentType::definition()->serializer->fromData(new PayloadData([]));
+        TextContentType::definition(TestTexts::textModule())->serializer->fromData(new PayloadData([]));
     }
 
     public function testRendererOutputsPayloadHtml(): void
     {
-        $content = TextContentType::definition()->renderer->render(new TextPayload('<p>Hi</p>'));
+        $content = TextContentType::definition(TestTexts::textModule())->renderer->render(new TextPayload('<p>Hi</p>'));
 
         $this->assertSame('<p>Hi</p>', $content->html);
         $this->assertSame([], $content->assets);
@@ -68,7 +69,7 @@ final class TextContentTypeTest extends TestCase
     public function testRolesRejectForeignPayload(): void
     {
         $foreign = new class implements Payload {};
-        $definition = TextContentType::definition();
+        $definition = TextContentType::definition(TestTexts::textModule());
 
         $this->expectException(InvalidArgumentException::class);
 
@@ -81,6 +82,6 @@ final class TextContentTypeTest extends TestCase
 
         $this->expectException(InvalidArgumentException::class);
 
-        TextContentType::definition()->renderer->render($foreign);
+        TextContentType::definition(TestTexts::textModule())->renderer->render($foreign);
     }
 }

@@ -34,9 +34,9 @@ final readonly class ModuleFixtures
     {
         return sprintf(
             '$context->addContentType(new \Yef\Domain\ContentType\ContentTypeDefinition('
-            . 'new \Yef\Domain\ContentType\ContentTypeId(\'%s\'), \'Fixture type\', new \YefCms\TextPages\TextPageForm(), '
-            . 'new \YefCms\TextPages\TextPayloadFactory(), '
-            . 'new \YefCms\TextPages\TextPayloadSerializer(), '
+            . 'new \Yef\Domain\ContentType\ContentTypeId(\'%s\'), $context->texts()->t(\'type.title\'), new \YefCms\TextPages\TextPageForm($context->texts()), '
+            . 'new \YefCms\TextPages\TextPayloadFactory($context->texts()), '
+            . 'new \YefCms\TextPages\TextPayloadSerializer($context->texts()), '
             . 'new \YefCms\TextPages\TextContentRenderer()));',
             $id,
         );

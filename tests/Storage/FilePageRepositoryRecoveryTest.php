@@ -20,6 +20,7 @@ use Yef\Domain\Page\PagePath;
 use Yef\Storage\FilePageRepository;
 use Yef\Storage\StorageLayout;
 use Yef\Tests\Support\TemporaryDirectory;
+use Yef\Tests\Support\TestTexts;
 use YefCms\TextPages\TextContentType;
 use YefCms\TextPages\TextPayload;
 
@@ -225,7 +226,7 @@ final class FilePageRepositoryRecoveryTest extends TestCase
     {
         return new FilePageRepository(
             new StorageLayout($this->directory->path . '/content/pages', $this->directory->path . '/var/storage'),
-            $types ?? TextContentType::registry(),
+            $types ?? TextContentType::registry(TestTexts::textModule()),
         );
     }
 

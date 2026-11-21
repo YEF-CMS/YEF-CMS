@@ -110,6 +110,12 @@ return [
     'modules.disable_confirm' => 'Disable module',
     'modules.error.cannot_enable' => 'The module cannot be enabled: see the reason in the list.',
     'modules.error.settings' => 'The list of enabled modules could not be saved.',
+    'modules.reason.incompatible' => 'Needs Yef {needs}, but this is {current}.',
+    'modules.reason.not_installed' => 'Enabled, but not installed.',
+    'modules.reason.class_missing' => 'Class {class} was not found.',
+    'modules.reason.not_a_module' => 'Class {class} does not implement ModuleInterface.',
+    'modules.reason.registration_failed' => 'Registration failed: {reason}',
+    'modules.reason.type_taken' => 'Content type “{type}” is already provided by module “{module}”.',
 
     'apply.title' => 'Apply changes',
     'apply.intro' => 'Saved pages reach the public site only after the changes are applied. Only the pages that changed are built again, and the pages that were deleted or turned into drafts are taken down.',

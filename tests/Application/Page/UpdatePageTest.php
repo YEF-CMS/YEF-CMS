@@ -18,6 +18,7 @@ use Yef\Domain\Page\Page;
 use Yef\Tests\Support\FrozenClock;
 use Yef\Tests\Support\InMemoryPageRepository;
 use Yef\Tests\Support\SequentialPageIdGenerator;
+use Yef\Tests\Support\TestTexts;
 use YefCms\TextPages\TextContentType;
 use YefCms\TextPages\TextPayload;
 
@@ -38,10 +39,10 @@ final class UpdatePageTest extends TestCase
     {
         $this->pages = new InMemoryPageRepository();
         $this->clock = new FrozenClock();
-        $this->updatePage = new UpdatePage($this->pages, TextContentType::registry(), $this->clock);
+        $this->updatePage = new UpdatePage($this->pages, TextContentType::registry(TestTexts::textModule()), $this->clock);
         $this->createPage = new CreatePage(
             $this->pages,
-            TextContentType::registry(),
+            TextContentType::registry(TestTexts::textModule()),
             new SequentialPageIdGenerator(),
             $this->clock,
         );

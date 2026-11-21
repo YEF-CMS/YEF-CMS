@@ -14,4 +14,5 @@
 - Admin: the "Modules" screen shows the installed modules with their titles, versions and states, and enables or disables them.
 - Admin: pages are edited in CKEditor 5 with three text formats (Minimal, Standard, Full HTML) chosen on the form, and can be previewed in a new tab before they are saved; the editor can take the look of the site from `/assets/editor.css`. The admin now sends a Content Security Policy.
 - Admin: the interface is available in English, Russian, German, French and Italian; the language is one setting for the whole site, switched from the top bar, and the editor follows it. The translations of German, French and Italian have not been reviewed by native speakers yet.
+- Modules bring their own texts (`messages/<language>/<module directory>.php`) and read them with `$context->texts()->t('key')`, so the names of content types, the labels of fields, the messages of a module and the title of the module are shown in the language of the site. The reasons the core gives for a module that cannot be used are translated too.
 - Console commands `yef:user:create` and `yef:user:password`.

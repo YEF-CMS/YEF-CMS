@@ -28,6 +28,7 @@ use Yef\Tests\Support\AdminHttpScenario;
 use Yef\Tests\Support\FakePageRenderer;
 use Yef\Tests\Support\FrozenClock;
 use Yef\Tests\Support\SequentialPageIdGenerator;
+use Yef\Tests\Support\TestTexts;
 use YefCms\TextPages\TextContentRenderer;
 use YefCms\TextPages\TextPageForm;
 use YefCms\TextPages\TextPayloadSerializer;
@@ -89,7 +90,7 @@ final class PreviewScreenTest extends TestCase
         $types = new ContentTypeRegistry([new ContentTypeDefinition(
             new ContentTypeId('strict'),
             'Strict',
-            new TextPageForm(),
+            new TextPageForm(TestTexts::textModule()),
             new readonly class implements PayloadFactory {
                 #[Override]
                 public function fromInput(array $input): Payload
@@ -97,7 +98,7 @@ final class PreviewScreenTest extends TestCase
                     throw new InvalidPayload('The body is not acceptable.');
                 }
             },
-            new TextPayloadSerializer(),
+            new TextPayloadSerializer(TestTexts::textModule()),
             new TextContentRenderer(),
         )]);
         $action = new PreviewAction(

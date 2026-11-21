@@ -13,6 +13,7 @@ use Yef\Domain\ContentType\ContentTypeId;
 use Yef\Domain\ContentType\ContentTypeRegistry;
 use Yef\Domain\ContentType\FieldKind;
 use Yef\Domain\ContentType\FormField;
+use Yef\Tests\Support\TestTexts;
 use YefCms\TextPages\TextContentRenderer;
 use YefCms\TextPages\TextContentType;
 use YefCms\TextPages\TextPageForm;
@@ -61,22 +62,22 @@ final class ContentTypeDefinitionTest extends TestCase
         new ContentTypeDefinition(
             new ContentTypeId('text'),
             ' ',
-            new TextPageForm(),
-            new TextPayloadFactory(),
-            new TextPayloadSerializer(),
+            new TextPageForm(TestTexts::textModule()),
+            new TextPayloadFactory(TestTexts::textModule()),
+            new TextPayloadSerializer(TestTexts::textModule()),
             new TextContentRenderer(),
         );
     }
 
     public function testRegistryListsTheTypesInTheOrderTheyWereRegistered(): void
     {
-        $text = TextContentType::definition();
+        $text = TextContentType::definition(TestTexts::textModule());
         $other = new ContentTypeDefinition(
             new ContentTypeId('news'),
             'News item',
-            new TextPageForm(),
-            new TextPayloadFactory(),
-            new TextPayloadSerializer(),
+            new TextPageForm(TestTexts::textModule()),
+            new TextPayloadFactory(TestTexts::textModule()),
+            new TextPayloadSerializer(TestTexts::textModule()),
             new TextContentRenderer(),
         );
 
@@ -88,7 +89,7 @@ final class ContentTypeDefinitionTest extends TestCase
 
     public function testTextPageFormHasOneRichTextFieldAndFillsItFromThePayload(): void
     {
-        $form = TextContentType::definition()->form;
+        $form = TextContentType::definition(TestTexts::textModule())->form;
 
         $this->assertSame(['body'], array_map(static fn(FormField $field): string => $field->name, $form->fields()));
         $this->assertSame([FieldKind::RichText], array_map(static fn(FormField $field): FieldKind => $field->kind, $form->fields()));
@@ -99,7 +100,7 @@ final class ContentTypeDefinitionTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        TextContentType::definition()->form->valuesOf(new \Yef\Domain\ContentType\UnavailablePayload(
+        TextContentType::definition(TestTexts::textModule())->form->valuesOf(new \Yef\Domain\ContentType\UnavailablePayload(
             new ContentTypeId('gallery'),
             new \Yef\Domain\ContentType\PayloadData([]),
         ));

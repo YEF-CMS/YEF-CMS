@@ -16,6 +16,7 @@ use Yef\Domain\Page\PageMetadata;
 use Yef\Tests\Support\FrozenClock;
 use Yef\Tests\Support\InMemoryPageRepository;
 use Yef\Tests\Support\SequentialPageIdGenerator;
+use Yef\Tests\Support\TestTexts;
 use YefCms\TextPages\TextContentType;
 
 #[CoversClass(DeletePage::class)]
@@ -32,7 +33,7 @@ final class DeleteAndListPagesTest extends TestCase
         $this->pages = new InMemoryPageRepository();
         $this->createPage = new CreatePage(
             $this->pages,
-            TextContentType::registry(),
+            TextContentType::registry(TestTexts::textModule()),
             new SequentialPageIdGenerator(),
             new FrozenClock(),
         );

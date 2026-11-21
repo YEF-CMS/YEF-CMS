@@ -24,6 +24,7 @@ use Yef\Domain\Page\Page;
 use Yef\Tests\Support\FrozenClock;
 use Yef\Tests\Support\InMemoryPageRepository;
 use Yef\Tests\Support\SequentialPageIdGenerator;
+use Yef\Tests\Support\TestTexts;
 use Yef\Tests\Support\TextPages;
 use YefCms\TextPages\TextContentType;
 
@@ -45,7 +46,7 @@ final class PageScreensScenariosTest extends TestCase
         $this->pages = new InMemoryPageRepository();
         $this->createPage = new CreatePage(
             $this->pages,
-            TextContentType::registry(),
+            TextContentType::registry(TestTexts::textModule()),
             new SequentialPageIdGenerator(),
             new FrozenClock(),
         );
@@ -70,7 +71,7 @@ final class PageScreensScenariosTest extends TestCase
     {
         $page = $this->createPage->handle(new CreatePageCommand('text', 'about', 'About', ['body' => '<p>Hi</p>']));
 
-        $toEdit = new GetPage($this->pages, TextContentType::registry())->handle($page->metadata->id->value);
+        $toEdit = new GetPage($this->pages, TextContentType::registry(TestTexts::textModule()))->handle($page->metadata->id->value);
 
         $this->assertEquals($page, $toEdit->page);
         $this->assertTrue($toEdit->canBeEdited());
@@ -95,7 +96,7 @@ final class PageScreensScenariosTest extends TestCase
         );
         $this->pages->save($page);
 
-        $toEdit = new GetPage($this->pages, TextContentType::registry())->handle('01JC0000000000000000000001');
+        $toEdit = new GetPage($this->pages, TextContentType::registry(TestTexts::textModule()))->handle('01JC0000000000000000000001');
 
         $this->assertInstanceOf(UnavailablePayload::class, $toEdit->page->payload);
     }
@@ -104,19 +105,19 @@ final class PageScreensScenariosTest extends TestCase
     {
         $this->expectException(PageNotFound::class);
 
-        new GetPage($this->pages, TextContentType::registry())->handle('01JC0000000000000000000009');
+        new GetPage($this->pages, TextContentType::registry(TestTexts::textModule()))->handle('01JC0000000000000000000009');
     }
 
     public function testAnIdThatIsNotAnIdIsReportedAsInvalid(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
-        new GetPage($this->pages, TextContentType::registry())->handle('not-an-id');
+        new GetPage($this->pages, TextContentType::registry(TestTexts::textModule()))->handle('not-an-id');
     }
 
     public function testListsTheTypesOfTheEnabledModules(): void
     {
-        $types = new ListContentTypes(TextContentType::registry())->handle();
+        $types = new ListContentTypes(TextContentType::registry(TestTexts::textModule()))->handle();
 
         $this->assertSame(['text'], array_map(static fn(\Yef\Domain\ContentType\ContentTypeDefinition $type): string => $type->id->value, $types));
     }

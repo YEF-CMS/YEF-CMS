@@ -116,7 +116,7 @@ final readonly class AdminHttpScenario
         $this->languages = new AdminLanguages(['en' => 'English', 'ru' => 'Русский', 'de' => 'Deutsch', 'fr' => 'Français', 'it' => 'Italiano'], 'en');
         $this->changeLanguage = new ChangeAdminLanguage($this->languageSetting, $this->languages);
         $this->pages = new InMemoryPageRepository();
-        $types = TextContentType::registry();
+        $types = TextContentType::registry(TestTexts::textModule());
         $clock = new FrozenClock();
         $this->createPage = new CreatePage($this->pages, $types, new SequentialPageIdGenerator(), $clock);
         $this->updatePage = new UpdatePage($this->pages, $types, $clock);

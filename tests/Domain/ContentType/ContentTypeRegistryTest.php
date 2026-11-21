@@ -10,6 +10,7 @@ use PHPUnit\Framework\TestCase;
 use Yef\Domain\ContentType\ContentTypeId;
 use Yef\Domain\ContentType\ContentTypeRegistry;
 use Yef\Domain\ContentType\Exception\UnknownContentType;
+use Yef\Tests\Support\TestTexts;
 use YefCms\TextPages\TextContentType;
 
 #[CoversClass(ContentTypeRegistry::class)]
@@ -18,7 +19,7 @@ final class ContentTypeRegistryTest extends TestCase
 {
     public function testReturnsRegisteredDefinition(): void
     {
-        $definition = TextContentType::definition();
+        $definition = TextContentType::definition(TestTexts::textModule());
 
         $registry = new ContentTypeRegistry([$definition]);
 
@@ -27,7 +28,7 @@ final class ContentTypeRegistryTest extends TestCase
 
     public function testTellsWhetherTypeIsRegistered(): void
     {
-        $registry = TextContentType::registry();
+        $registry = TextContentType::registry(TestTexts::textModule());
 
         $this->assertTrue($registry->has(new ContentTypeId(TextContentType::ID)));
         $this->assertFalse($registry->has(new ContentTypeId('gallery')));
@@ -44,6 +45,6 @@ final class ContentTypeRegistryTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        new ContentTypeRegistry([TextContentType::definition(), TextContentType::definition()]);
+        new ContentTypeRegistry([TextContentType::definition(TestTexts::textModule()), TextContentType::definition(TestTexts::textModule())]);
     }
 }
