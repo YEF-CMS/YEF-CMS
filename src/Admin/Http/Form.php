@@ -37,6 +37,24 @@ final readonly class Form
         return new self(is_array($section) ? $section : []);
     }
 
+    /**
+     * Every field that is plain text, by name.
+     *
+     * @return array<string, string>
+     */
+    public function strings(): array
+    {
+        $strings = [];
+        /** @psalm-suppress MixedAssignment The type is checked right below. */
+        foreach ($this->fields as $name => $value) {
+            if (is_string($value)) {
+                $strings[(string) $name] = $value;
+            }
+        }
+
+        return $strings;
+    }
+
     public function text(string $field): string
     {
         /** @psalm-suppress MixedAssignment The type is checked right below. */

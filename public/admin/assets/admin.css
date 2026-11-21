@@ -38,3 +38,8 @@
         border-bottom: 1px solid var(--bs-border-color);
     }
 }
+
+/* The text area of the editor is a document, so it gets room to write. */
+.yef-form .ck-editor__editable_inline {
+    min-height: 22rem;
+}

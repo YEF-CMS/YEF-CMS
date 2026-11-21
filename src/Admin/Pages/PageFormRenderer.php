@@ -8,6 +8,8 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Yef\Admin\View\AdminView;
 use Yef\Domain\ContentType\ContentTypeDefinition;
+use Yef\Domain\ContentType\FieldKind;
+use Yef\Domain\ContentType\FormField;
 
 /**
  * Draws the page form for creating a page or editing one.
@@ -30,6 +32,7 @@ final readonly class PageFormRenderer
         return $this->view->render($request, 'pages/form', [
             'type' => $type,
             'fields' => $type->form->fields(),
+            'hasRichText' => array_any($type->form->fields(), static fn(FormField $field): bool => $field->kind === FieldKind::RichText),
             'values' => $values,
             'errors' => $errors,
             'pageId' => $pageId,

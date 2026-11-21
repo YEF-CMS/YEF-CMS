@@ -50,6 +50,15 @@
             {% elseif field.kind.value == 'long_text' %}
                 <textarea class="form-control" id="field-{{ field.name }}" name="fields[{{ field.name }}]" rows="5"{{ field.required ? ' required' : '' }}>{{ values.fields[field.name] }}</textarea>
             {% else %}
+                <div class="mb-2 d-none" data-yef-format-bar
+                     data-default="{{ pageId ? 'full' : 'standard' }}"
+                     data-site-css="{{ siteUrl }}/assets/editor.css"
+                     data-fallback-css="{{ assetsUrl }}/editor-content.css"
+                     data-label="{{ t('editor.format') }}"
+                     data-minimal="{{ t('editor.format.minimal') }}"
+                     data-standard="{{ t('editor.format.standard') }}"
+                     data-full="{{ t('editor.format.full') }}"
+                     data-confirm="{{ t('editor.confirm_narrow') }}"></div>
                 <textarea class="form-control font-monospace" id="field-{{ field.name }}" name="fields[{{ field.name }}]" rows="14" data-yef-rich-text{{ field.required ? ' required' : '' }}>{{ values.fields[field.name] }}</textarea>
             {% endif %}
         </div>
@@ -74,6 +83,20 @@
     </div>
 
     <button type="submit" class="btn btn-primary">{{ t('common.save') }}</button>
+    <button type="submit" class="btn btn-outline-primary" formaction="{{ url('admin.pages.preview', {}, {type: type.id.value}) }}" formtarget="_blank" formnovalidate>{{ t('pages.preview') }}</button>
     <a class="btn btn-outline-secondary" href="{{ url('admin.pages') }}">{{ t('common.cancel') }}</a>
 </form>
+{% endblock %}
+
+{% block head %}
+{% if hasRichText %}
+    <link rel="stylesheet" href="{{ assetsUrl }}/vendor/ckeditor5/ckeditor5.css">
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{% if hasRichText %}
+    <script src="{{ assetsUrl }}/vendor/ckeditor5/ckeditor5.umd.js"></script>
+    <script src="{{ assetsUrl }}/editor.js"></script>
+{% endif %}
 {% endblock %}

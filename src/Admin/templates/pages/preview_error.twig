@@ -1,0 +1,15 @@
+{% extends 'layout.twig' %}
+
+{% block page_title %}{{ t('pages.preview_failed') }}{% endblock %}
+
+{% block nav_pages %}active{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-3">{{ t('pages.preview_failed') }}</h1>
+{% for message in messages %}
+    <div class="alert alert-danger">{% if message.key %}{{ t(message.key, message.params) }}{% else %}{{ message.text }}{% endif %}</div>
+{% else %}
+    <div class="alert alert-danger">{{ t('pages.error.invalid') }}</div>
+{% endfor %}
+<p class="text-body-secondary">{{ t('pages.preview_failed_hint') }}</p>
+{% endblock %}

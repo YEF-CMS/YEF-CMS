@@ -29,6 +29,7 @@ return [
             Route::methods(['GET', 'POST'], '/pages/new')
                 ->action(Admin\Pages\NewAction::class)
                 ->name('admin.pages.new'),
+            Route::post('/pages/preview')->action(Admin\Pages\PreviewAction::class)->name('admin.pages.preview'),
             Route::methods(['GET', 'POST'], '/pages/{id}/edit')
                 ->action(Admin\Pages\EditAction::class)
                 ->name('admin.pages.edit'),

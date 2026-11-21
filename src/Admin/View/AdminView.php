@@ -27,7 +27,7 @@ use function is_string;
  *
  * It is a separate environment from the one that builds the public site: those templates belong to the site owner,
  * these to the admin. Templates get `t()` for texts, `url()` for links to named routes, and the variables
- * `csrfToken` and `assetsUrl`.
+ * `csrfToken`, `assetsUrl` (the admin's own files) and `siteUrl` (the address of the public site).
  *
  * @psalm-api Wired through config/web/di/admin.php.
  */
@@ -71,6 +71,7 @@ final readonly class AdminView
         $variables += [
             'csrfToken' => $this->csrfToken->getValue(),
             'assetsUrl' => $this->directoryOf($request) . '/assets',
+            'siteUrl' => rtrim(dirname($this->directoryOf($request)), '/.'),
             'flash' => $this->flashMessages(),
             'login' => $this->signedInLogin(),
         ];

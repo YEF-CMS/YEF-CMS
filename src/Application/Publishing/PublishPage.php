@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace Yef\Application\Publishing;
 
-use Yef\Domain\ContentType\ContentTypeRegistry;
 use Yef\Domain\ContentType\UnavailablePayload;
 use Yef\Domain\Page\Exception\PageDataCorrupted;
 use Yef\Domain\Page\Exception\PageNotFound;
 use Yef\Domain\Page\Exception\PageStorageFailed;
-use Yef\Domain\Page\Page;
 use Yef\Domain\Page\PageId;
 use Yef\Domain\Page\PageRepository;
 use Yef\Domain\Page\PageVersions;
@@ -19,7 +17,6 @@ use Yef\Domain\Publishing\PublicPath;
 use Yef\Domain\Publishing\PublishedPage;
 use Yef\Domain\Publishing\PublishedPages;
 use Yef\Domain\Rendering\Exception\RenderingFailed;
-use Yef\Domain\Rendering\PageRenderer;
 
 /**
  * Makes the public HTML of a page match the page: builds it for a published page, removes it for a draft.
@@ -34,8 +31,7 @@ final readonly class PublishPage
         private PageVersions $versions,
         private PublishedPages $published,
         private PublishedHtml $html,
-        private ContentTypeRegistry $contentTypes,
-        private PageRenderer $renderer,
+        private RenderPage $renderPage,
         private PublicArtifactPublisher $publisher,
     ) {}
 
@@ -71,7 +67,7 @@ final readonly class PublishPage
             return PublishResult::Withdrawn;
         }
 
-        $this->publisher->publish(PublicPath::forPage($path), $this->render($page));
+        $this->publisher->publish(PublicPath::forPage($path), $this->renderPage->handle($page->metadata, $page->payload));
         if ($previous instanceof PublishedPage && !$previous->path->equals($path)) {
             $this->html->remove($previous->path, $pageId);
         }
@@ -79,12 +75,5 @@ final readonly class PublishPage
         $this->published->record(new PublishedPage($pageId, $path, $version));
 
         return PublishResult::Published;
-    }
-
-    private function render(Page $page): string
-    {
-        $content = $this->contentTypes->get($page->metadata->type)->renderer->render($page->payload);
-
-        return $this->renderer->render($page->metadata, $content);
     }
 }

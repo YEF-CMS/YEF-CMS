@@ -12,6 +12,7 @@ use Yef\Application\Publishing\PlanChanges;
 use Yef\Application\Publishing\PublishedHtml;
 use Yef\Application\Publishing\PublishPage;
 use Yef\Application\Publishing\RebuildSite;
+use Yef\Application\Publishing\RenderPage;
 use Yef\Application\Publishing\UnpublishPage;
 use Yef\Domain\Page\Page;
 use YefCms\TextPages\TextContentType;
@@ -50,8 +51,7 @@ final readonly class PublishingScenario
             $this->pages,
             $this->published,
             $html,
-            TextContentType::registry(),
-            new FakePageRenderer(),
+            new RenderPage(TextContentType::registry(), new FakePageRenderer()),
             $this->publisher,
         );
         $this->unpublishPage = new UnpublishPage($this->published, $html);

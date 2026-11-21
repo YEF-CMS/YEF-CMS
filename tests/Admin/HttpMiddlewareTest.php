@@ -40,6 +40,36 @@ final class HttpMiddlewareTest extends TestCase
         $this->assertSame('same-origin', $response->getHeaderLine('Referrer-Policy'));
     }
 
+    public function testScriptsMayComeOnlyFromTheAdminItself(): void
+    {
+        $response = new SecurityHeaders()->process(new ServerRequestFactory()->createServerRequest('GET', '/'), $this->handlerReturning(new ResponseFactory()->createResponse(200)));
+
+        $policy = $response->getHeaderLine('Content-Security-Policy');
+        $this->assertStringContainsString("script-src 'self'", $policy);
+        $this->assertStringContainsString("object-src 'none'", $policy);
+        $this->assertStringContainsString("frame-ancestors 'none'", $policy);
+        $this->assertStringNotContainsString('unsafe-eval', $policy);
+        $this->assertStringNotContainsString("script-src 'self' 'unsafe-inline'", $policy);
+    }
+
+    public function testAResponseThatSetsItsOwnPolicyKeepsIt(): void
+    {
+        $own = new ResponseFactory()->createResponse(200)->withHeader('Content-Security-Policy', 'sandbox');
+
+        $response = new SecurityHeaders()->process(new ServerRequestFactory()->createServerRequest('GET', '/'), $this->handlerReturning($own));
+
+        $this->assertSame('sandbox', $response->getHeaderLine('Content-Security-Policy'));
+    }
+
+    public function testFormReadsOnlyPlainTextFieldsOfASection(): void
+    {
+        $request = new ServerRequestFactory()->createServerRequest('POST', '/')->withParsedBody([
+            'fields' => ['body' => 'text', 'list' => ['a'], 7 => 'numbered'],
+        ]);
+
+        $this->assertSame(['body' => 'text', '7' => 'numbered'], Form::of($request)->section('fields')->strings());
+    }
+
     public function testFormWithoutAValidCsrfTokenIsForbidden(): void
     {
         $response = new CsrfFailureHandler(new ResponseFactory())->handle(new ServerRequestFactory()->createServerRequest('POST', '/login'));
@@ -65,5 +95,18 @@ final class HttpMiddlewareTest extends TestCase
     public function testRequestWithoutAFormBodyReadsAsEmpty(): void
     {
         $this->assertSame('', Form::of(new ServerRequestFactory()->createServerRequest('POST', '/login'))->text('login'));
+    }
+
+    private function handlerReturning(ResponseInterface $response): RequestHandlerInterface
+    {
+        return new readonly class ($response) implements RequestHandlerInterface {
+            public function __construct(private ResponseInterface $response) {}
+
+            #[Override]
+            public function handle(ServerRequestInterface $request): ResponseInterface
+            {
+                return $this->response;
+            }
+        };
     }
 }

@@ -17,6 +17,7 @@ use Yef\Application\Page\DeletePage;
 use Yef\Application\Page\GetPage;
 use Yef\Application\Page\ListContentTypes;
 use Yef\Application\Page\ListPages;
+use Yef\Application\Page\PreviewPage;
 use Yef\Application\Page\SummarizePages;
 use Yef\Application\Page\UpdatePage;
 use Yef\Application\Publishing\ApplyChange;
@@ -24,6 +25,7 @@ use Yef\Application\Publishing\ApplyPageChange;
 use Yef\Application\Publishing\PlanChanges;
 use Yef\Application\Publishing\PublishedHtml;
 use Yef\Application\Publishing\PublishPage;
+use Yef\Application\Publishing\RenderPage;
 use Yef\Application\Publishing\UnpublishPage;
 use Yef\Application\User\Authenticate;
 use Yef\Application\User\CompleteSetup;
@@ -91,6 +93,8 @@ final readonly class AdminHttpScenario
 
     public PlanChanges $planChanges;
 
+    public PreviewPage $previewPage;
+
     public ApplyPageChange $applyPageChange;
 
     private string $cacheDirectory;
@@ -113,7 +117,9 @@ final readonly class AdminHttpScenario
         $this->publisher = new InMemoryArtifactPublisher();
         $html = new PublishedHtml($this->publisher, $this->published);
         $unpublishPage = new UnpublishPage($this->published, $html);
-        $publishPage = new PublishPage($this->pages, $this->pages, $this->published, $html, $types, new FakePageRenderer(), $this->publisher);
+        $renderPage = new RenderPage($types, new FakePageRenderer());
+        $publishPage = new PublishPage($this->pages, $this->pages, $this->published, $html, $renderPage, $this->publisher);
+        $this->previewPage = new PreviewPage($types, new SequentialPageIdGenerator(), $clock, $renderPage);
         $this->planChanges = new PlanChanges($this->pages, $this->pages, $this->published, $types);
         $this->applyPageChange = new ApplyPageChange($this->planChanges, new ApplyChange($publishPage, $unpublishPage));
         $this->users = new InMemoryUserRepository();
