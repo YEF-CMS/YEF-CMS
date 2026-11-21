@@ -340,7 +340,7 @@ final class PagesScreensTest extends TestCase
         $this->admin->createPage->handle(new CreatePageCommand('text', 'two', 'Two', ['body' => '']));
         $this->admin->signIn();
 
-        $response = new \Yef\Admin\Dashboard\Action($this->admin->summarizePages, $this->admin->view)($this->admin->request());
+        $response = new \Yef\Admin\Dashboard\Action($this->admin->summarizePages, $this->admin->planChanges, $this->admin->view)($this->admin->request());
         $html = $this->body($response);
 
         $this->assertMatchesRegularExpression('/display-6">2<.*?>Pages</s', $html);
@@ -398,7 +398,7 @@ final class PagesScreensTest extends TestCase
 
     private function listAction(): ListAction
     {
-        return new ListAction($this->admin->listPages, $this->admin->listContentTypes, $this->admin->view);
+        return new ListAction($this->admin->listPages, $this->admin->listContentTypes, $this->admin->planChanges, $this->admin->view);
     }
 
     private function newAction(?ContentTypeRegistry $types = null): NewAction

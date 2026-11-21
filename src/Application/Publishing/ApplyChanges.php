@@ -7,7 +7,6 @@ namespace Yef\Application\Publishing;
 use Yef\Domain\Page\Exception\PageDataCorrupted;
 use Yef\Domain\Page\Exception\PageNotFound;
 use Yef\Domain\Page\Exception\PageStorageFailed;
-use Yef\Domain\Page\PageId;
 use Yef\Domain\Publishing\Exception\PublishingFailed;
 use Yef\Domain\Rendering\Exception\RenderingFailed;
 
@@ -15,14 +14,13 @@ use Yef\Domain\Rendering\Exception\RenderingFailed;
  * Brings the public site in line with the pages in one pass: builds what changed, takes down what is gone.
  * A change that fails does not stop the others; the next run plans it again.
  *
- * @psalm-api Used by the admin and console adapters.
+ * @psalm-api Used by the console adapter.
  */
 final readonly class ApplyChanges
 {
     public function __construct(
         private PlanChanges $planChanges,
-        private PublishPage $publishPage,
-        private UnpublishPage $unpublishPage,
+        private ApplyChange $applyChange,
     ) {}
 
     /**
@@ -38,7 +36,7 @@ final readonly class ApplyChanges
 
         foreach ($this->planChanges->handle()->changes as $change) {
             try {
-                $result = $this->apply($change);
+                $result = $this->applyChange->handle($change);
             } catch (PageDataCorrupted|PageNotFound|PageStorageFailed|PublishingFailed|RenderingFailed) {
                 $failed[] = $change->page;
                 continue;
@@ -52,29 +50,5 @@ final readonly class ApplyChanges
         }
 
         return new ApplyReport($built, $removed, $skipped, $failed);
-    }
-
-    /**
-     * @throws PageDataCorrupted
-     * @throws PageNotFound
-     * @throws PageStorageFailed
-     * @throws PublishingFailed
-     * @throws RenderingFailed
-     */
-    private function apply(Change $change): PublishResult
-    {
-        return $change->action === ChangeAction::Build
-            ? $this->publishPage->handle($change->page->value)
-            : $this->remove($change->page);
-    }
-
-    /**
-     * @throws PublishingFailed
-     */
-    private function remove(PageId $id): PublishResult
-    {
-        $this->unpublishPage->handle($id);
-
-        return PublishResult::Withdrawn;
     }
 }

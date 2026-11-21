@@ -19,6 +19,12 @@ use Yef\Application\Page\ListContentTypes;
 use Yef\Application\Page\ListPages;
 use Yef\Application\Page\SummarizePages;
 use Yef\Application\Page\UpdatePage;
+use Yef\Application\Publishing\ApplyChange;
+use Yef\Application\Publishing\ApplyPageChange;
+use Yef\Application\Publishing\PlanChanges;
+use Yef\Application\Publishing\PublishedHtml;
+use Yef\Application\Publishing\PublishPage;
+use Yef\Application\Publishing\UnpublishPage;
 use Yef\Application\User\Authenticate;
 use Yef\Application\User\CompleteSetup;
 use Yef\Application\User\CreateUser;
@@ -79,6 +85,14 @@ final readonly class AdminHttpScenario
 
     public SummarizePages $summarizePages;
 
+    public InMemoryPublishedPages $published;
+
+    public InMemoryArtifactPublisher $publisher;
+
+    public PlanChanges $planChanges;
+
+    public ApplyPageChange $applyPageChange;
+
     private string $cacheDirectory;
 
     public function __construct()
@@ -95,6 +109,13 @@ final readonly class AdminHttpScenario
         $this->listPages = new ListPages($this->pages);
         $this->listContentTypes = new ListContentTypes($types);
         $this->summarizePages = new SummarizePages($this->pages);
+        $this->published = new InMemoryPublishedPages();
+        $this->publisher = new InMemoryArtifactPublisher();
+        $html = new PublishedHtml($this->publisher, $this->published);
+        $unpublishPage = new UnpublishPage($this->published, $html);
+        $publishPage = new PublishPage($this->pages, $this->pages, $this->published, $html, $types, new FakePageRenderer(), $this->publisher);
+        $this->planChanges = new PlanChanges($this->pages, $this->pages, $this->published, $types);
+        $this->applyPageChange = new ApplyPageChange($this->planChanges, new ApplyChange($publishPage, $unpublishPage));
         $this->users = new InMemoryUserRepository();
         $this->setupToken = new InMemorySetupToken();
         $hasher = new FakePasswordHasher();

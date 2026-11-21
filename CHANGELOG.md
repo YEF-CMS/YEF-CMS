@@ -10,4 +10,5 @@
 - Static HTML is built with Twig and published to the document root; `yef:apply` builds only the pages that changed and takes down removed ones.
 - Modules are loaded at run time from `modules/`; they can be enabled and disabled (`yef:modules`, `yef:module:enable`, `yef:module:disable`), and a failing module is skipped instead of breaking the site.
 - Admin: sign-in by login and password, first-run setup with a code read from the server's files, page management (list, create, edit, delete) with a form that every content type describes itself. Works with and without URL rewriting.
+- Admin: the "Apply changes" screen lists what changed and applies it page by page with a progress bar, so a large site does not hit the execution time limit; the pages list and the dashboard remind about changes that wait.
 - Console commands `yef:user:create` and `yef:user:password`.

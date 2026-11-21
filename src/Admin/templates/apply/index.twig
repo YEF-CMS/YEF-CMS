@@ -1,0 +1,55 @@
+{% extends 'layout.twig' %}
+
+{% block page_title %}{{ t('apply.title') }}{% endblock %}
+
+{% block nav_apply %}active{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-3">{{ t('apply.title') }}</h1>
+
+{% if changes is empty %}
+    <div class="alert alert-success">{{ t('apply.up_to_date') }}</div>
+{% else %}
+    <p>{{ t('apply.intro') }}</p>
+
+    <div id="apply" data-step-url="{{ url('admin.apply.step') }}" data-csrf="{{ csrfToken }}"
+         data-text-built="{{ t('apply.state.built') }}"
+         data-text-removed="{{ t('apply.state.removed') }}"
+         data-text-skipped="{{ t('apply.state.skipped') }}"
+         data-text-failed="{{ t('apply.state.failed') }}"
+         data-text-done="{{ t('apply.done') }}"
+         data-text-done-with-failures="{{ t('apply.done_with_failures') }}">
+        <div class="table-responsive mb-3">
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th>{{ t('apply.column.page') }}</th>
+                        <th>{{ t('apply.column.address') }}</th>
+                        <th>{{ t('apply.column.action') }}</th>
+                        <th>{{ t('apply.column.state') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for change in changes %}
+                    <tr data-page="{{ change.page.value }}">
+                        <td>{{ change.title ?? t('apply.deleted_page') }}</td>
+                        <td><code>{{ change.path.isHome ? '/' : '/' ~ change.path.value ~ '/' }}</code></td>
+                        <td>{{ change.action.value == 'build' ? t('apply.action.build') : t('apply.action.remove') }}</td>
+                        <td class="state text-body-secondary">{{ t('apply.state.waiting') }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="progress mb-3 d-none" role="progressbar" aria-label="{{ t('apply.title') }}">
+            <div class="progress-bar" style="width: 0%"></div>
+        </div>
+        <div class="result mb-3" aria-live="polite"></div>
+
+        <button type="button" class="btn btn-primary btn-lg start">{{ t('apply.start') }}</button>
+        <noscript><div class="alert alert-danger mt-3">{{ t('apply.needs_script') }}</div></noscript>
+    </div>
+    <script src="{{ assetsUrl }}/apply.js"></script>
+{% endif %}
+{% endblock %}

@@ -33,5 +33,7 @@ return [
                 ->action(Admin\Pages\EditAction::class)
                 ->name('admin.pages.edit'),
             Route::post('/pages/{id}/delete')->action(Admin\Pages\DeleteAction::class)->name('admin.pages.delete'),
+            Route::get('/apply')->action(Admin\Apply\ScreenAction::class)->name('admin.apply'),
+            Route::post('/apply/step')->action(Admin\Apply\StepAction::class)->name('admin.apply.step'),
         ),
 ];

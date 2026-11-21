@@ -20,6 +20,11 @@ final readonly class ChangePlan
      */
     public function __construct(public array $changes) {}
 
+    public function count(): int
+    {
+        return count($this->changes);
+    }
+
     public function isEmpty(): bool
     {
         return count($this->changes) === 0;

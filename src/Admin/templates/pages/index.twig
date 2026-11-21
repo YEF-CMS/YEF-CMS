@@ -10,7 +10,7 @@
     <a class="btn btn-primary" href="{{ url('admin.pages.new') }}">{{ t('pages.new') }}</a>
 </div>
 
-<div class="alert alert-info">{{ t('pages.apply_hint') }}</div>
+{% include '_pending.twig' %}
 
 {% if pages is empty %}
     <p class="text-body-secondary">{{ t('pages.empty') }}</p>

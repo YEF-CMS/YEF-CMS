@@ -9,6 +9,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Yef\Admin\View\AdminView;
 use Yef\Application\Page\ListContentTypes;
 use Yef\Application\Page\ListPages;
+use Yef\Application\Publishing\PlanChanges;
 
 /**
  * The list of the site's pages.
@@ -20,6 +21,7 @@ final readonly class ListAction
     public function __construct(
         private ListPages $listPages,
         private ListContentTypes $listContentTypes,
+        private PlanChanges $planChanges,
         private AdminView $view,
     ) {}
 
@@ -35,6 +37,7 @@ final readonly class ListAction
             'pages' => $this->listPages->handle(),
             'types' => $types,
             'typeTitles' => $titles,
+            'pending' => $this->planChanges->handle()->count(),
         ]);
     }
 }

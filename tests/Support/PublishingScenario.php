@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Yef\Tests\Support;
 
 use DateTimeImmutable;
+use Yef\Application\Publishing\ApplyChange;
 use Yef\Application\Publishing\ApplyChanges;
+use Yef\Application\Publishing\ApplyPageChange;
 use Yef\Application\Publishing\PlanChanges;
 use Yef\Application\Publishing\PublishedHtml;
 use Yef\Application\Publishing\PublishPage;
@@ -33,6 +35,8 @@ final readonly class PublishingScenario
 
     public ApplyChanges $applyChanges;
 
+    public ApplyPageChange $applyPageChange;
+
     public RebuildSite $rebuildSite;
 
     public function __construct()
@@ -52,7 +56,9 @@ final readonly class PublishingScenario
         );
         $this->unpublishPage = new UnpublishPage($this->published, $html);
         $this->planChanges = new PlanChanges($this->pages, $this->pages, $this->published, TextContentType::registry());
-        $this->applyChanges = new ApplyChanges($this->planChanges, $this->publishPage, $this->unpublishPage);
+        $applyChange = new ApplyChange($this->publishPage, $this->unpublishPage);
+        $this->applyChanges = new ApplyChanges($this->planChanges, $applyChange);
+        $this->applyPageChange = new ApplyPageChange($this->planChanges, $applyChange);
         $this->rebuildSite = new RebuildSite($this->pages, $this->publishPage);
     }
 

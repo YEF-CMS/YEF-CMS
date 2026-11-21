@@ -54,16 +54,16 @@ final readonly class PlanChanges
             $entry = $published[$metadata->id->value] ?? null;
             if ($metadata->isPublished()) {
                 if ($this->needsBuild($metadata, $entry, $versions)) {
-                    $builds[] = new Change(ChangeAction::Build, $metadata->id);
+                    $builds[] = new Change(ChangeAction::Build, $metadata->id, $metadata->details->path, $metadata->details->title);
                 }
             } elseif ($entry instanceof PublishedPage) {
-                $removals[] = new Change(ChangeAction::Remove, $metadata->id);
+                $removals[] = new Change(ChangeAction::Remove, $metadata->id, $entry->path, $metadata->details->title);
             }
         }
 
         foreach ($published as $id => $entry) {
             if (!isset($existing[$id])) {
-                $removals[] = new Change(ChangeAction::Remove, $entry->id);
+                $removals[] = new Change(ChangeAction::Remove, $entry->id, $entry->path);
             }
         }
 
