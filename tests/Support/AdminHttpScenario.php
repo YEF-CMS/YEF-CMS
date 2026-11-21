@@ -27,6 +27,9 @@ use Yef\Application\Publishing\PublishedHtml;
 use Yef\Application\Publishing\PublishPage;
 use Yef\Application\Publishing\RenderPage;
 use Yef\Application\Publishing\UnpublishPage;
+use Yef\Application\Settings\AdminLanguages;
+use Yef\Application\Settings\ChangeAdminLanguage;
+use Yef\Application\Settings\CurrentAdminLanguage;
 use Yef\Application\User\Authenticate;
 use Yef\Application\User\CompleteSetup;
 use Yef\Application\User\CreateUser;
@@ -71,6 +74,12 @@ final readonly class AdminHttpScenario
 
     public InMemoryFlash $flash;
 
+    public InMemoryAdminLanguageSetting $languageSetting;
+
+    public AdminLanguages $languages;
+
+    public ChangeAdminLanguage $changeLanguage;
+
     public InMemoryPageRepository $pages;
 
     public CreatePage $createPage;
@@ -103,6 +112,9 @@ final readonly class AdminHttpScenario
     {
         $root = dirname(__DIR__, 2);
         $this->flash = new InMemoryFlash();
+        $this->languageSetting = new InMemoryAdminLanguageSetting();
+        $this->languages = new AdminLanguages(['en' => 'English', 'ru' => 'Русский', 'de' => 'Deutsch', 'fr' => 'Français', 'it' => 'Italiano'], 'en');
+        $this->changeLanguage = new ChangeAdminLanguage($this->languageSetting, $this->languages);
         $this->pages = new InMemoryPageRepository();
         $types = TextContentType::registry();
         $clock = new FrozenClock();
@@ -160,6 +172,8 @@ final readonly class AdminHttpScenario
             $this->currentUser,
             $this->findUser,
             $responses,
+            new CurrentAdminLanguage($this->languageSetting, $this->languages),
+            $this->languages,
         );
     }
 

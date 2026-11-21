@@ -8,6 +8,8 @@ use Yef\Admin\Authentication\UserIdentityRepository;
 use Yef\Admin\Http\CsrfFailureHandler;
 use Yef\Admin\Http\StripScriptName;
 use Yef\Admin\View\AdminView;
+use Yef\Application\Settings\AdminLanguages;
+use Yef\Application\Settings\CurrentAdminLanguage;
 use Yef\Application\User\FindUser;
 use Yiisoft\Aliases\Aliases;
 use Yiisoft\Auth\IdentityRepositoryInterface;
@@ -85,6 +87,8 @@ return [
         CurrentUser $currentUser,
         FindUser $findUser,
         ResponseFactoryInterface $responseFactory,
+        CurrentAdminLanguage $currentLanguage,
+        AdminLanguages $languages,
     ): AdminView => new AdminView(
         $aliases->get('@src/Admin/templates'),
         $aliases->get('@runtime/twig-admin'),
@@ -95,5 +99,7 @@ return [
         $currentUser,
         $findUser,
         $responseFactory,
+        $currentLanguage,
+        $languages,
     ),
 ];

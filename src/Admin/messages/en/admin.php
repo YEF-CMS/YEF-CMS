@@ -12,6 +12,9 @@ return [
     'nav.dashboard' => 'Dashboard',
     'nav.logout' => 'Sign out',
     'nav.signed_in_as' => 'Signed in as {login}',
+    'nav.language' => 'Language',
+    'nav.language_apply' => 'Change',
+    'language.error.save' => 'The language could not be saved.',
 
     'login.title' => 'Sign in',
     'login.login' => 'Login',

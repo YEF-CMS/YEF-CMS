@@ -18,6 +18,16 @@ return [
             'attemptPeriod' => 900,
             // Set to true on a host without URL rewriting: links then always contain index.php (/admin/index.php/login).
             'scriptNameInUrls' => false,
+            // The languages of the admin, by code, with their names in the language itself. The owner picks one
+            // for the whole site in the admin; the texts of a language are in src/Admin/messages/<code>/admin.php.
+            // Until one is picked, 'yiisoft/translator' => 'locale' below is used.
+            'languages' => [
+                'en' => 'English',
+                'ru' => 'Русский',
+                'de' => 'Deutsch',
+                'fr' => 'Français',
+                'it' => 'Italiano',
+            ],
         ],
     ],
     'yiisoft/translator' => [

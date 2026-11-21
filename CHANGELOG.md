@@ -13,4 +13,5 @@
 - Admin: the "Apply changes" screen lists what changed and applies it page by page with a progress bar, so a large site does not hit the execution time limit; the pages list and the dashboard remind about changes that wait.
 - Admin: the "Modules" screen shows the installed modules with their titles, versions and states, and enables or disables them.
 - Admin: pages are edited in CKEditor 5 with three text formats (Minimal, Standard, Full HTML) chosen on the form, and can be previewed in a new tab before they are saved; the editor can take the look of the site from `/assets/editor.css`. The admin now sends a Content Security Policy.
+- Admin: the interface is available in English, Russian, German, French and Italian; the language is one setting for the whole site, switched from the top bar, and the editor follows it. The translations of German, French and Italian have not been reviewed by native speakers yet.
 - Console commands `yef:user:create` and `yef:user:password`.

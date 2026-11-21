@@ -8,11 +8,23 @@
 <nav class="navbar navbar-dark bg-dark yef-topbar">
     <div class="container-fluid">
         <a class="navbar-brand" href="{{ url('admin.dashboard') }}">{{ t('app.name') }}</a>
-        <form method="post" action="{{ url('admin.logout') }}" class="d-flex align-items-center gap-3 m-0">
-            <span class="navbar-text">{{ t('nav.signed_in_as', {login: login}) }}</span>
-            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-            <button type="submit" class="btn btn-outline-light btn-sm">{{ t('nav.logout') }}</button>
-        </form>
+        <div class="d-flex align-items-center gap-3">
+            <form method="post" action="{{ url('admin.language') }}" class="m-0 yef-language">
+                <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+                <label class="visually-hidden" for="language">{{ t('nav.language') }}</label>
+                <select class="form-select form-select-sm" id="language" name="language">
+                    {% for code, name in languages %}
+                        <option value="{{ code }}"{{ code == language ? ' selected' : '' }}>{{ name }}</option>
+                    {% endfor %}
+                </select>
+                <noscript><button type="submit" class="btn btn-outline-light btn-sm">{{ t('nav.language_apply') }}</button></noscript>
+            </form>
+            <form method="post" action="{{ url('admin.logout') }}" class="d-flex align-items-center gap-3 m-0">
+                <span class="navbar-text">{{ t('nav.signed_in_as', {login: login}) }}</span>
+                <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+                <button type="submit" class="btn btn-outline-light btn-sm">{{ t('nav.logout') }}</button>
+            </form>
+        </div>
     </div>
 </nav>
 <div class="yef-shell">
@@ -42,4 +54,5 @@
         {% block content %}{% endblock %}
     </main>
 </div>
+<script src="{{ assetsUrl }}/language.js"></script>
 {% endblock %}

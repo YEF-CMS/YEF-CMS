@@ -67,11 +67,13 @@
 
     var PROFILES = {minimal: MINIMAL, standard: STANDARD, full: FULL};
 
-    function configOf(format) {
+    function configOf(format, language) {
         var profile = PROFILES[format];
 
         return Object.assign({
             licenseKey: 'GPL',
+            // The texts of the editor come from translations/<language>.umd.js; English is built in.
+            language: language,
             plugins: plugins(profile.plugins),
             toolbar: profile.toolbar
         }, profile.extra);
@@ -128,7 +130,7 @@
         bar.classList.add('d-flex', 'align-items-center');
 
         function create(format) {
-            return CK.ClassicEditor.create(textarea, configOf(format)).then(function (created) {
+            return CK.ClassicEditor.create(textarea, configOf(format, bar.dataset.language)).then(function (created) {
                 editor = created;
                 current = format;
             });

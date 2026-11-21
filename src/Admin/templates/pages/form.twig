@@ -52,6 +52,7 @@
             {% else %}
                 <div class="mb-2 d-none" data-yef-format-bar
                      data-default="{{ pageId ? 'full' : 'standard' }}"
+                     data-language="{{ language }}"
                      data-site-css="{{ siteUrl }}/assets/editor.css"
                      data-fallback-css="{{ assetsUrl }}/editor-content.css"
                      data-label="{{ t('editor.format') }}"
@@ -97,6 +98,9 @@
 {% block scripts %}
 {% if hasRichText %}
     <script src="{{ assetsUrl }}/vendor/ckeditor5/ckeditor5.umd.js"></script>
+    {% if language != 'en' %}
+        <script src="{{ assetsUrl }}/vendor/ckeditor5/translations/{{ language }}.umd.js"></script>
+    {% endif %}
     <script src="{{ assetsUrl }}/editor.js"></script>
 {% endif %}
 {% endblock %}
