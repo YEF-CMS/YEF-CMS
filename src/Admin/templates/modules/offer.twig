@@ -1,0 +1,69 @@
+{% extends 'layout.twig' %}
+
+{% block page_title %}{{ offer.isUpdate ? t('modules.offer.title_update') : t('modules.offer.title_install') }}{% endblock %}
+
+{% block nav_modules %}active{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-3">{{ offer.isUpdate ? t('modules.offer.title_update') : t('modules.offer.title_install') }}</h1>
+
+{% for problem in offer.problems %}
+    <div class="alert alert-danger">{{ t('modules.problem.' ~ problem.kind.value, {detail: problem.detail}) }}</div>
+{% endfor %}
+
+{% if error %}
+    <div class="alert alert-danger">{{ t(error) }}</div>
+{% endif %}
+
+<table class="table w-auto">
+    <tbody>
+        <tr>
+            <th scope="row">{{ t('modules.offer.name') }}</th>
+            <td>{{ offer.info.title }}</td>
+        </tr>
+        <tr>
+            <th scope="row">{{ t('modules.offer.technical_name') }}</th>
+            <td><code>{{ offer.info.name.value }}</code></td>
+        </tr>
+        {% if offer.info.description %}
+        <tr>
+            <th scope="row">{{ t('modules.offer.description') }}</th>
+            <td>{{ offer.info.description }}</td>
+        </tr>
+        {% endif %}
+        <tr>
+            <th scope="row">{{ t('modules.offer.version') }}</th>
+            <td>{{ offer.release.version.value }}</td>
+        </tr>
+        {% if offer.installed %}
+        <tr>
+            <th scope="row">{{ t('modules.offer.installed_version') }}</th>
+            <td>{{ offer.installed.version.value }}</td>
+        </tr>
+        {% endif %}
+        <tr>
+            <th scope="row">{{ t('modules.offer.repository') }}</th>
+            <td><a href="{{ offer.release.repository.address }}" target="_blank" rel="noopener noreferrer">{{ offer.release.repository.owner }}/{{ offer.release.repository.name }}</a></td>
+        </tr>
+        <tr>
+            <th scope="row">{{ t('modules.offer.core') }}</th>
+            <td><code>{{ offer.info.coreConstraint }}</code></td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="alert alert-warning">{{ t('modules.offer.warning') }}</div>
+
+<form method="post" action="{{ url('admin.modules.offer', {token: offer.token}) }}" class="mb-3">
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+    <div class="mb-3" style="max-width: 24rem">
+        <label for="password" class="form-label">{{ t('modules.offer.password') }}</label>
+        <input type="password" class="form-control" id="password" name="password" autocomplete="current-password" aria-describedby="password-help" required>
+        <div class="form-text" id="password-help">{{ t('modules.offer.password_hint') }}</div>
+    </div>
+    <button type="submit" class="btn btn-primary"{{ offer.canBeApplied ? '' : ' disabled' }}>
+        {{ offer.isUpdate ? t('modules.offer.confirm_update') : t('modules.offer.confirm_install') }}
+    </button>
+    <a class="btn btn-outline-secondary" href="{{ url('admin.modules') }}">{{ t('common.cancel') }}</a>
+</form>
+{% endblock %}

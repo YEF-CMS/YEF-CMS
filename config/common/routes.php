@@ -35,6 +35,18 @@ return [
                 ->name('admin.pages.edit'),
             Route::post('/pages/{id}/delete')->action(Admin\Pages\DeleteAction::class)->name('admin.pages.delete'),
             Route::get('/modules')->action(Admin\Modules\ListAction::class)->name('admin.modules'),
+            Route::methods(['GET', 'POST'], '/modules/install')
+                ->action(Admin\Modules\InstallFormAction::class)
+                ->name('admin.modules.install'),
+            Route::get('/modules/offer/{token}')->action(Admin\Modules\OfferAction::class)->name('admin.modules.offer'),
+            // Confirming asks for the password again, so guessing it is limited like signing in.
+            Route::post('/modules/offer/{token}')
+                ->middleware(LimitRequestsMiddleware::class)
+                ->action(Admin\Modules\OfferAction::class)
+                ->name('admin.modules.offer.confirm'),
+            Route::post('/modules/check-updates')->action(Admin\Modules\CheckUpdatesAction::class)->name('admin.modules.check_updates'),
+            Route::post('/modules/{name}/update')->action(Admin\Modules\PrepareUpdateAction::class)->name('admin.modules.update'),
+            Route::post('/modules/{name}/remove')->action(Admin\Modules\RemoveAction::class)->name('admin.modules.remove'),
             Route::post('/modules/{name}/enable')->action(Admin\Modules\EnableAction::class)->name('admin.modules.enable'),
             Route::post('/modules/{name}/disable')->action(Admin\Modules\DisableAction::class)->name('admin.modules.disable'),
             Route::post('/language')->action(Admin\Language\Action::class)->name('admin.language'),

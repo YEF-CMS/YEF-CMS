@@ -43,6 +43,25 @@ final readonly class ManifestReader
      */
     public function read(string $directory): ModuleManifest
     {
+        return $this->readIn($directory, true);
+    }
+
+    /**
+     * Reads the manifest of a module that is not in its place yet (a freshly unpacked one), so the name of its
+     * directory means nothing.
+     *
+     * @throws InvalidManifest
+     */
+    public function readUnplaced(string $directory): ModuleManifest
+    {
+        return $this->readIn($directory, false);
+    }
+
+    /**
+     * @throws InvalidManifest
+     */
+    private function readIn(string $directory, bool $inPlace): ModuleManifest
+    {
         $data = $this->decode($directory . '/' . self::FILE);
 
         if (($data['schema'] ?? null) !== self::SCHEMA) {
@@ -50,7 +69,7 @@ final readonly class ManifestReader
         }
 
         $name = $this->name($data);
-        if (basename($directory) !== $name->directoryName()) {
+        if ($inPlace && basename($directory) !== $name->directoryName()) {
             throw InvalidManifest::because(sprintf('The directory must be named "%s" for the module "%s".', $name->directoryName(), $name));
         }
 

@@ -28,6 +28,7 @@ use Yef\Tests\Support\FakePasswordHasher;
 use Yef\Tests\Support\FrozenClock;
 use Yef\Tests\Support\InMemorySetupToken;
 use Yef\Tests\Support\InMemoryUserRepository;
+use Yef\Tests\Support\RecordingDefaultModules;
 use Yef\Tests\Support\SequentialUserIdGenerator;
 
 #[CoversClass(CreateUser::class)]
@@ -49,9 +50,12 @@ final class UserScenariosTest extends TestCase
 
     private CreateUser $createUser;
 
+    private RecordingDefaultModules $defaultModules;
+
     #[Override]
     protected function setUp(): void
     {
+        $this->defaultModules = new RecordingDefaultModules();
         $this->users = new InMemoryUserRepository();
         $this->hasher = new FakePasswordHasher();
         $this->token = new InMemorySetupToken();
@@ -238,6 +242,20 @@ final class UserScenariosTest extends TestCase
         $this->assertFalse($this->token->exists());
     }
 
+    public function testSetupStartsTheSiteWithItsDefaultModules(): void
+    {
+        $this->completeSetup()->handle('admin', 'secret1', $this->token->current());
+
+        $this->assertSame(1, $this->defaultModules->provided);
+    }
+
+    public function testCreatingUsersOutsideSetupDoesNotTouchTheModules(): void
+    {
+        $this->createUser->handle('admin', 'secret1');
+
+        $this->assertSame(0, $this->defaultModules->provided);
+    }
+
     public function testSetupWithAWrongCodeCreatesNothing(): void
     {
         $this->token->current();
@@ -246,6 +264,7 @@ final class UserScenariosTest extends TestCase
             $this->completeSetup()->handle('admin', 'secret1', 'guess');
             $this->fail('A wrong code must be refused.');
         } catch (InvalidSetupToken) {
+            $this->assertSame(0, $this->defaultModules->provided);
             $this->assertFalse($this->users->hasAny());
             $this->assertTrue($this->token->exists());
         }
@@ -274,6 +293,6 @@ final class UserScenariosTest extends TestCase
 
     private function completeSetup(): CompleteSetup
     {
-        return new CompleteSetup($this->users, $this->token, $this->createUser);
+        return new CompleteSetup($this->users, $this->token, $this->createUser, $this->defaultModules);
     }
 }

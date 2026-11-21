@@ -84,6 +84,13 @@ final class TranslationsTest extends TestCase
 
         $this->assertNotSame([], $asked);
         foreach ($asked as $key => $template) {
+            // A key that ends with a dot is a prefix, completed by the template ("modules.problem." . kind).
+            if (str_ends_with($key, '.')) {
+                $this->assertNotSame([], array_filter(array_keys($defined), static fn(string $known): bool => str_starts_with($known, $key)), $key . ' is used in ' . $template);
+
+                continue;
+            }
+
             $this->assertArrayHasKey($key, $defined, $key . ' is used in ' . $template);
         }
     }

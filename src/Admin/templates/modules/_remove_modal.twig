@@ -1,0 +1,19 @@
+<div class="modal fade" id="remove-{{ module.slug }}" tabindex="-1" aria-labelledby="remove-title-{{ module.slug }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <form class="modal-content" method="post" action="{{ url('admin.modules.remove', {name: module.slug}) }}">
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+            <div class="modal-header">
+                <h2 class="modal-title h5" id="remove-title-{{ module.slug }}">{{ t('modules.remove_title') }}</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ t('common.cancel') }}"></button>
+            </div>
+            <div class="modal-body">
+                <p>{{ t('modules.remove_question', {title: module.status.title}) }}</p>
+                <p class="text-body-secondary mb-0">{{ t('modules.remove_note') }}</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ t('common.cancel') }}</button>
+                <button type="submit" class="btn btn-danger">{{ t('modules.remove_confirm') }}</button>
+            </div>
+        </form>
+    </div>
+</div>

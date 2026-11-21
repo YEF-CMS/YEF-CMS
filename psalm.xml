@@ -25,6 +25,8 @@
         <directory name="public"/>
         <ignoreFiles>
             <directory name="vendor"/>
+            <!-- A stand-alone script that tests run as a server, not part of the code base. -->
+            <file name="tests/Support/GithubMock/router.php"/>
         </ignoreFiles>
     </projectFiles>
 

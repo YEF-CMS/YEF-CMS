@@ -6,10 +6,6 @@ namespace Yef\Admin\Modules;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Yef\Admin\View\AdminView;
-use Yef\Application\Module\ListModules;
-
-use function array_map;
 
 /**
  * The installed modules with their states and the buttons that switch them.
@@ -18,15 +14,10 @@ use function array_map;
  */
 final readonly class ListAction
 {
-    public function __construct(
-        private ListModules $listModules,
-        private AdminView $view,
-    ) {}
+    public function __construct(private ModuleListRenderer $renderer) {}
 
     public function __invoke(ServerRequestInterface $request): ResponseInterface
     {
-        return $this->view->render($request, 'modules/index', [
-            'modules' => array_map(ModuleRow::of(...), $this->listModules->handle()),
-        ]);
+        return $this->renderer->render($request);
     }
 }

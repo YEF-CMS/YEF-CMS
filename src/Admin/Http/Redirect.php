@@ -31,6 +31,14 @@ final readonly class Redirect
     }
 
     /**
+     * @param array<string, string> $arguments The values of the route's placeholders.
+     */
+    public function toWith(string $routeName, array $arguments): ResponseInterface
+    {
+        return $this->redirectTo($this->urlGenerator->generate($routeName, $arguments));
+    }
+
+    /**
      * Back to the page the request came from, if that page belongs to this site; otherwise to the named route.
      * Only the path and query of the referring page are used, so a page on another site cannot send the visitor away.
      */

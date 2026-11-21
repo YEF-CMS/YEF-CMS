@@ -12,16 +12,19 @@ use Psr\Http\Message\ResponseInterface;
 use Yef\Admin\Modules\DisableAction;
 use Yef\Admin\Modules\EnableAction;
 use Yef\Admin\Modules\ListAction;
+use Yef\Admin\Modules\ModuleListRenderer;
 use Yef\Admin\Modules\ModuleRow;
 use Yef\Admin\NotFound\NotFoundHandler;
 use Yef\Application\Module\DisableModule;
 use Yef\Application\Module\EnableModule;
 use Yef\Application\Module\ListModules;
+use Yef\Application\ModuleInstall\ListInstalledModules;
 use Yef\Domain\Module\ModuleName;
 use Yef\Domain\Module\ModuleState;
 use Yef\Domain\Module\ModuleStatus;
 use Yef\Tests\Support\AdminHttpScenario;
 use Yef\Tests\Support\InMemoryEnabledModules;
+use Yef\Tests\Support\InMemoryInstalledModules;
 use Yef\Tests\Support\InMemoryModuleCatalog;
 use Yiisoft\Router\CurrentRoute;
 use Yiisoft\Router\Route;
@@ -176,7 +179,7 @@ final class ModuleScreensTest extends TestCase
      */
     private function list(array $statuses): ResponseInterface
     {
-        return new ListAction(new ListModules(new InMemoryModuleCatalog($statuses)), $this->admin->view)(
+        return new ListAction(new ModuleListRenderer(new ListModules(new InMemoryModuleCatalog($statuses)), new ListInstalledModules(new InMemoryInstalledModules()), $this->admin->view))(
             $this->admin->request('GET', '/modules'),
         );
     }

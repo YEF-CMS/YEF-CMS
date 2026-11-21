@@ -142,7 +142,7 @@ final readonly class AdminHttpScenario
         $this->findUser = new FindUser($this->users);
         $this->prepareSetup = new PrepareSetup($this->users, $this->setupToken);
         $this->authenticate = new Authenticate($this->users, $hasher);
-        $this->completeSetup = new CompleteSetup($this->users, $this->setupToken, $this->createUser);
+        $this->completeSetup = new CompleteSetup($this->users, $this->setupToken, $this->createUser, new RecordingDefaultModules());
         $this->urls = new RecordingUrlGenerator();
         $responses = new ResponseFactory();
         $this->redirect = new Redirect($responses, $this->urls);

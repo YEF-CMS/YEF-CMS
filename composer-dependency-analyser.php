@@ -18,6 +18,12 @@ return (new Configuration())
         ['ext-ctype'],
         [ErrorType::UNUSED_DEPENDENCY],
     )
+    // Only the installer of modules needs these, and the CMS works without it, so they are suggested, not required:
+    // the installation environment check (Yef\Setup\EnvironmentChecker) warns when they are missing.
+    ->ignoreErrorsOnExtensions(
+        ['ext-zip', 'ext-curl'],
+        [ErrorType::SHADOW_DEPENDENCY],
+    )
     ->ignoreErrorsOnPackages(
         [
             'yiisoft/config',

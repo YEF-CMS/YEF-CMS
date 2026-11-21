@@ -64,6 +64,10 @@
         "shipmonk/composer-dependency-analyser": "^1.8.4",
         "vimeo/psalm": "^6.16.1"
     },
+    "suggest": {
+        "ext-zip": "Needed to install and update modules from GitHub",
+        "ext-curl": "Used to reach GitHub when installing modules; without it PHP streams (allow_url_fopen) are used"
+    },
     "autoload": {
         "psr-4": {
             "Yef\\": "src/"

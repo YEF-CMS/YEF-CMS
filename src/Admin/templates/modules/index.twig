@@ -5,7 +5,18 @@
 {% block nav_modules %}active{% endblock %}
 
 {% block content %}
-<h1 class="h3 mb-3">{{ t('modules.title') }}</h1>
+<div class="d-flex justify-content-between align-items-center mb-3 gap-2 flex-wrap">
+    <h1 class="h3 m-0">{{ t('modules.title') }}</h1>
+    <div class="d-flex gap-2">
+        {% if hasInstalled %}
+            <form method="post" action="{{ url('admin.modules.check_updates') }}" class="m-0">
+                <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+                <button type="submit" class="btn btn-outline-secondary">{{ t('modules.check_updates') }}</button>
+            </form>
+        {% endif %}
+        <a class="btn btn-primary" href="{{ url('admin.modules.install') }}">{{ t('modules.install_button') }}</a>
+    </div>
+</div>
 
 {% if modules is empty %}
     <p class="text-body-secondary">{{ t('modules.empty') }}</p>
@@ -30,6 +41,20 @@
                         {% if state == 'failed' %}
                             <div class="small text-danger">{{ module.status.reason }}</div>
                         {% endif %}
+                        {% if module.installed %}
+                            <div class="small text-body-secondary">
+                                {{ t('modules.source', {repository: module.installed.repository.owner ~ '/' ~ module.installed.repository.name, version: module.installed.version.value}) }}
+                            </div>
+                        {% endif %}
+                        {% if checked and module.check %}
+                            {% if module.check.updateIsAvailable %}
+                                <div class="small text-success">{{ t('modules.update_available', {from: module.installed.version.value, to: module.check.latest.value}) }}</div>
+                            {% elseif module.check.failure %}
+                                <div class="small text-warning">{{ t('modules.check_failed.' ~ module.check.failure.value) }}</div>
+                            {% else %}
+                                <div class="small text-body-secondary">{{ t('modules.up_to_date') }}</div>
+                            {% endif %}
+                        {% endif %}
                     </td>
                     <td><code>{{ module.status.id }}</code></td>
                     <td>{{ module.status.version }}</td>
@@ -44,6 +69,12 @@
                     </td>
                     <td class="text-end text-nowrap">
                         {% if module.slug is not null %}
+                            {% if checked and module.check and module.check.updateIsAvailable %}
+                                <form method="post" action="{{ url('admin.modules.update', {name: module.slug}) }}" class="d-inline">
+                                    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+                                    <button type="submit" class="btn btn-sm btn-success">{{ t('modules.update') }}</button>
+                                </form>
+                            {% endif %}
                             {% if state == 'disabled' %}
                                 <form method="post" action="{{ url('admin.modules.enable', {name: module.slug}) }}" class="d-inline">
                                     <input type="hidden" name="_csrf" value="{{ csrfToken }}">
@@ -52,6 +83,10 @@
                             {% else %}
                                 <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#disable-{{ module.slug }}">{{ t('modules.disable') }}</button>
                                 {% include 'modules/_disable_modal.twig' %}
+                            {% endif %}
+                            {% if module.installed %}
+                                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#remove-{{ module.slug }}">{{ t('modules.remove') }}</button>
+                                {% include 'modules/_remove_modal.twig' %}
                             {% endif %}
                         {% endif %}
                     </td>

@@ -1,0 +1,25 @@
+{% extends 'layout.twig' %}
+
+{% block page_title %}{{ t('modules.install.title') }}{% endblock %}
+
+{% block nav_modules %}active{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-3">{{ t('modules.install.title') }}</h1>
+<p>{{ t('modules.install.intro') }}</p>
+
+{% if error %}
+    <div class="alert alert-danger">{{ t(error.key, error.params) }}</div>
+{% endif %}
+
+<form method="post" action="{{ url('admin.modules.install') }}" novalidate>
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+    <div class="mb-3">
+        <label for="address" class="form-label">{{ t('modules.install.address') }}</label>
+        <input type="text" class="form-control font-monospace" id="address" name="address" value="{{ address }}" placeholder="https://github.com/owner/module-name" aria-describedby="address-help" autofocus required>
+        <div class="form-text" id="address-help">{{ t('modules.install.address_hint') }}</div>
+    </div>
+    <button type="submit" class="btn btn-primary">{{ t('modules.install.submit') }}</button>
+    <a class="btn btn-outline-secondary" href="{{ url('admin.modules') }}">{{ t('common.cancel') }}</a>
+</form>
+{% endblock %}

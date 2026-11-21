@@ -84,7 +84,7 @@ final readonly class Files
      */
     public function move(string $from, string $to): void
     {
-        if (!rename($from, $to)) {
+        if (!@rename($from, $to)) {
             throw StorageIoFailure::during('move', $from);
         }
     }
